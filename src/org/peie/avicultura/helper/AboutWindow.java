@@ -1,5 +1,9 @@
 package org.peie.avicultura.helper;
 
+/*
+ * Peie
+ * */
+
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
