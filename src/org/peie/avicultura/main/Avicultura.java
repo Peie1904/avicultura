@@ -1,15 +1,17 @@
 package org.peie.avicultura.main;
 
 import java.io.File;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.peie.avicultura.helper.AviculturaException;
+import org.peie.avicultura.helper.Helper;
 
 public class Avicultura extends AviculturaUtility {
 	public final static String VERSION = "0.0.2 beta";
 	public final static String APPLICATION = "avicultura";
-	public final static String APPDATA = System.getenv("APPDATA");
-	public final static String DATABASE = APPDATA + File.separator
+	public static String APPDATA = System.getenv("APPDATA");
+	public static String DATABASE = APPDATA + File.separator
 			+ APPLICATION;
 	private final static Logger LOG = Logger.getLogger(Avicultura.class);
 
@@ -18,6 +20,12 @@ public class Avicultura extends AviculturaUtility {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		Properties props = Helper.parseArgs(args);
+		
+		APPDATA = props.getProperty(Helper.DBFOLDER);
+		DATABASE = APPDATA + File.separator
+				+ APPLICATION;
+		
 		LOG.info("Version: " + VERSION);
 		LOG.info("AppData: " + APPDATA);
 		LOG.info("DataBase: " + DATABASE);

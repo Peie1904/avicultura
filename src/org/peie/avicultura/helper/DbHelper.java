@@ -245,6 +245,10 @@ public class DbHelper {
 			throw new AviculturaException(
 					AviculturaException.DB_CONNECT_FAILED,
 					"can not close connect ", e);
+		} catch (NullPointerException  e) {
+			throw new AviculturaException(
+					AviculturaException.DB_CONNECT_FAILED,
+					"can not close connect a empty db", e);
 		}
 	}
 

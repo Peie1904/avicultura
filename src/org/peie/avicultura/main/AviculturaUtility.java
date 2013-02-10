@@ -32,6 +32,8 @@ public abstract class AviculturaUtility {
 		properties = new AviProperties();
 		
 		properties.put(AviProperties.KEY_RING_NO, "18489");
+		
+		
 
 	}
 

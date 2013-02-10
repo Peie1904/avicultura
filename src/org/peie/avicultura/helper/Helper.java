@@ -1,11 +1,24 @@
 package org.peie.avicultura.helper;
 
+import java.io.File;
 import java.rmi.server.UID;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Properties;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
+import org.apache.log4j.Logger;
 
 public class Helper {
+	
+	private static final String DB = "db";
+	public static final String DBFOLDER = "DBFOLDER";
+	private static Logger LOG = Logger.getLogger(Helper.class);
 
 	public static String getPid() {
 		UID uid = new UID();
@@ -122,5 +135,42 @@ public class Helper {
 		}
 
 		return check;
+	}
+	
+	public static Properties parseArgs(String[] args){
+		Properties props = new Properties();
+		
+		Options options = new Options();
+		
+		options.addOption(DB, true, "database folder");
+		
+		CommandLineParser parser = new PosixParser();
+		CommandLine cmd = null;
+		try {
+			cmd = parser.parse( options, args);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if (cmd.hasOption(DB)){
+			LOG.info("Use standard DB folder "+cmd.getOptionValue(DB));
+			File f = new File(cmd.getOptionValue(DB));
+			
+			if(f.exists()){
+				props.setProperty(DBFOLDER, f.getAbsolutePath());
+			}else{
+				LOG.error("Use standard DB folder because of none existing db folder: "+f.getAbsolutePath());
+				props.setProperty(DBFOLDER, System.getenv("APPDATA"));
+			}
+			
+			
+		}else{
+			LOG.info("Use standard DB folder");
+			props.setProperty(DBFOLDER, System.getenv("APPDATA"));
+		}
+		
+		
+		return props;
 	}
 }
