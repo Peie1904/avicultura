@@ -66,6 +66,7 @@ import org.peie.avicultura.pdf.ZuchtBuchWriter;
 
 public class Application {
 
+	private static final String JUNGTIERSTAMMBLATT = "Jungtierstammblatt";
 	public static final String ICONS_LOGO_SMALL_PNG = "icons/logo_small.png";
 	public static final String ICONS_SKY_LIGHT_ICONS_PNG_16X16_ACTIVE_NO_PNG = "icons/skyLight/icons/PNG/48x48/_active__no.png";
 	public static final String ICONS_SKY_LIGHT_ICONS_PNG_16X16_ACTIVE_COPY_PNG = "icons/skyLight/icons/PNG/16x16/_active__copy.png";
@@ -760,6 +761,10 @@ public class Application {
 			}
 		}
 	}
+	
+	private void createJungTierStammBlatt(String ringNo){
+		
+	}
 
 	public JPopupMenu popup;
 	private JLabel popUpLabel;
@@ -783,6 +788,11 @@ public class Application {
 				if (event.getActionCommand().toString().equals(LOESCHEN)) {
 					deleteBird(popUpLabel.getText());
 				}
+				
+				if (event.getActionCommand().toString().equals(JUNGTIERSTAMMBLATT)) {
+					LOG.info(JUNGTIERSTAMMBLATT+" "+popUpLabel.getText());
+					createJungTierStammBlatt(popUpLabel.getText());
+				}
 			}
 		};
 		JMenuItem item;
@@ -793,10 +803,17 @@ public class Application {
 		item.setHorizontalTextPosition(JMenuItem.RIGHT);
 		item.addActionListener(menuListener);
 		item.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE, LABEL_FONT_SIZE));
+		
 		popup.add(item = new JMenuItem(KOPIEREN, new ImageIcon(iconCopy)));
 		item.setHorizontalTextPosition(JMenuItem.RIGHT);
 		item.addActionListener(menuListener);
 		item.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE, LABEL_FONT_SIZE));
+		
+		popup.add(item = new JMenuItem(JUNGTIERSTAMMBLATT, new ImageIcon(iconPdf)));
+		item.setHorizontalTextPosition(JMenuItem.RIGHT);
+		item.addActionListener(menuListener);
+		item.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE, LABEL_FONT_SIZE));
+		
 		popup.add(item = new JMenuItem(LOESCHEN, new ImageIcon(iconDelete)));
 		item.setHorizontalTextPosition(JMenuItem.RIGHT);
 		item.addActionListener(menuListener);
