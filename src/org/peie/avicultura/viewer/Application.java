@@ -61,7 +61,9 @@ import org.peie.avicultura.helper.BirdObject;
 import org.peie.avicultura.helper.DbHelper;
 import org.peie.avicultura.helper.Helper;
 import org.peie.avicultura.helper.SearchResults;
+import org.peie.avicultura.helper.StammBlattObj;
 import org.peie.avicultura.main.Avicultura;
+import org.peie.avicultura.pdf.StammBlattWriter;
 import org.peie.avicultura.pdf.ZuchtBuchWriter;
 
 public class Application {
@@ -763,6 +765,13 @@ public class Application {
 	}
 	
 	private void createJungTierStammBlatt(String ringNo){
+		StammBlattObj sto = dbhelper.getStammBlattData(ringNo);
+		
+		File pdfFile = new File("Stammblatt-"+ringNo+".pdf");
+		
+		StammBlattWriter stamm = new StammBlattWriter(sto, pdfFile);
+		
+		stamm.writer();
 		
 	}
 

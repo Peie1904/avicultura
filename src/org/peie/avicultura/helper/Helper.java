@@ -137,6 +137,14 @@ public class Helper {
 		return check;
 	}
 	
+	public static String getGenderStr(double gender){
+		if (gender == 1.0){
+			return "Hahn";
+		}else{
+			return "Henne";
+		}
+	}
+	
 	public static Properties parseArgs(String[] args){
 		Properties props = new Properties();
 		

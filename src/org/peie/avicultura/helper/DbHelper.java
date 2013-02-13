@@ -55,6 +55,14 @@ public class DbHelper {
 	private PreparedStatement countDbStmt;
 	private static final String selectListSql = "select *,BIRDSPECIESNAME from birddata,BIRDSPECIES where birddata.birdtypeid = birdspecies.birdtypeid and MODFLAG = 0 order by RINGAT";
 	private PreparedStatement seletctListStmt;
+	private static final String selectStammBlattSql = "select distinct kind.RINGNO kindno,papa.RINGNO papano,mama.RINGNO mamano,art.BIRDSPECIESNAME," +
+			" kind.COLOR, kind.RINGAT, kind.GENDER, kind.SELLAT, kind.SELLADRESSE " +
+			"from BIRDDATA kind,BIRDDATA papa, BIRDDATA mama, BIRDSPECIES art " +
+			"where kind.RINGNO = ? " +
+			"and papa.RINGNO = TRIM(LEFT(kind.BIRDFATHER,POSITION(' ',kind.BIRDFATHER))) " +
+			"and mama.RINGNO = TRIM(LEFT(kind.BIRDMOTHER,POSITION(' ',kind.BIRDMOTHER))) " +
+			"and art.BIRDTYPEID = kind.BIRDTYPEID and kind.MODFLAG = 0";
+	private PreparedStatement selectStammBlattStmt;
 
 	public DbHelper(boolean newDb) throws AviculturaException {
 		// TODO Auto-generated constructor stub
@@ -78,11 +86,61 @@ public class DbHelper {
 			countDbStmt = con.prepareStatement(countDbSql);
 			seletctListStmt = con.prepareStatement(selectListSql);
 			hideBirdByRingNoStmt = con.prepareStatement(hideBirdByRingNoSql);
+			selectStammBlattStmt = con.prepareStatement(selectStammBlattSql);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+	}
+	
+	public StammBlattObj getStammBlattData(String ringNo){
+		
+		StammBlattObj sto = new StammBlattObj();
+		
+		try {
+			selectStammBlattStmt.setString(1, ringNo);
+			
+			ResultSet res = selectStammBlattStmt.executeQuery();
+
+			while (res.next()) {
+				log.info(res.getString("kindno"));
+				
+				String kindno = res.getString("kindno");
+				String papano = res.getString("papano");
+				String mamano = res.getString("mamano");
+				String BIRDSPECIESNAME = res.getString("BIRDSPECIESNAME");
+				String COLOR = res.getString("COLOR");
+				long RINGAT = res.getLong("RINGAT");
+				double GENDER = res.getDouble("GENDER");
+				long SELLAT = res.getLong("SELLAT");
+				String SELLADRESSE = res.getString("SELLADRESSE");
+				
+				sto.setKindno(kindno);
+				sto.setPapano(papano);
+				sto.setMamano(mamano);
+				sto.setBIRDSPECIESNAME(BIRDSPECIESNAME);
+				sto.setCOLOR(COLOR);
+				sto.setSELLADRESSE(SELLADRESSE);
+				sto.setRINGAT(RINGAT);
+				sto.setSELLAT(SELLAT);
+				sto.setGENDER(GENDER);
+				
+				
+				
+				
+				
+			}
+			
+			res.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return sto;
+		
 	}
 
 	public boolean checkImport() {
@@ -238,6 +296,7 @@ public class DbHelper {
 			hideBirdStmt.close();
 			seletctListStmt.close();
 			hideBirdByRingNoStmt.close();
+			selectStammBlattStmt.close();
 			con.close();
 
 			log.info("close database");
