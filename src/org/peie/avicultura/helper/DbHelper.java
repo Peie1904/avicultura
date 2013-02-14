@@ -55,17 +55,25 @@ public class DbHelper {
 	private PreparedStatement countDbStmt;
 	private static final String selectListSql = "select *,BIRDSPECIESNAME from birddata,BIRDSPECIES where birddata.birdtypeid = birdspecies.birdtypeid and MODFLAG = 0 order by RINGAT";
 	private PreparedStatement seletctListStmt;
-	private static final String selectStammBlattSql = "select distinct kind.RINGNO kindno,papa.RINGNO papano,mama.RINGNO mamano,art.BIRDSPECIESNAME," +
-			" kind.COLOR, kind.RINGAT, kind.GENDER, kind.SELLAT, kind.SELLADRESSE " +
-			"from BIRDDATA kind,BIRDDATA papa, BIRDDATA mama, BIRDSPECIES art " +
-			"where kind.RINGNO = ? " +
-			"and papa.RINGNO = TRIM(LEFT(kind.BIRDFATHER,POSITION(' ',kind.BIRDFATHER))) " +
-			"and mama.RINGNO = TRIM(LEFT(kind.BIRDMOTHER,POSITION(' ',kind.BIRDMOTHER))) " +
-			"and art.BIRDTYPEID = kind.BIRDTYPEID and kind.MODFLAG = 0";
+	private static final String selectStammBlattSql = "select distinct kind.RINGNO kindno,papa.RINGNO papano,mama.RINGNO mamano,art.BIRDSPECIESNAME,"
+			+ " kind.COLOR, kind.RINGAT, kind.GENDER, kind.SELLAT, kind.SELLADRESSE "
+			+ "from BIRDDATA kind,BIRDDATA papa, BIRDDATA mama, BIRDSPECIES art "
+			+ "where kind.RINGNO = ? "
+			+ "and papa.RINGNO = TRIM(LEFT(kind.BIRDFATHER,POSITION(' ',kind.BIRDFATHER))) "
+			+ "and mama.RINGNO = TRIM(LEFT(kind.BIRDMOTHER,POSITION(' ',kind.BIRDMOTHER))) "
+			+ "and art.BIRDTYPEID = kind.BIRDTYPEID and kind.MODFLAG = 0";
+
+	/*
+	 * select distinct kind.BIRDFATHER,kind.BIRDMOTHER from BIRDDATA
+	 * kind,BIRDDATA papa, BIRDDATA mama where LENGTH(kind.BIRDFATHER) > 3 and
+	 * LEngth(kind.BIRDMOTHER) > 3 and kind.MODFLAG = 0 and papa.RINGNO =
+	 * TRIM(LEFT(kind.BIRDFATHER,POSITION(' ',kind.BIRDFATHER))) and mama.RINGNO
+	 * = TRIM(LEFT(kind.BIRDMOTHER,POSITION(' ',kind.BIRDMOTHER)))
+	 */
+
 	private PreparedStatement selectStammBlattStmt;
 
 	public DbHelper(boolean newDb) throws AviculturaException {
-		// TODO Auto-generated constructor stub
 
 		con = createConnection();
 
@@ -88,24 +96,27 @@ public class DbHelper {
 			hideBirdByRingNoStmt = con.prepareStatement(hideBirdByRingNoSql);
 			selectStammBlattStmt = con.prepareStatement(selectStammBlattSql);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(
+					AviculturaException.DB_CONNECT_FAILED,
+					"preparation failed", e);
 		}
 
 	}
-	
-	public StammBlattObj getStammBlattData(String ringNo){
-		
-		StammBlattObj sto = new StammBlattObj();
-		
+
+	public StammBlattObj getStammBlattData(String ringNo)
+			throws AviculturaException {
+
+		StammBlattObj sto = null;
+
 		try {
 			selectStammBlattStmt.setString(1, ringNo);
-			
+
 			ResultSet res = selectStammBlattStmt.executeQuery();
 
 			while (res.next()) {
 				log.info(res.getString("kindno"));
-				
+				sto = new StammBlattObj();
+
 				String kindno = res.getString("kindno");
 				String papano = res.getString("papano");
 				String mamano = res.getString("mamano");
@@ -115,7 +126,7 @@ public class DbHelper {
 				double GENDER = res.getDouble("GENDER");
 				long SELLAT = res.getLong("SELLAT");
 				String SELLADRESSE = res.getString("SELLADRESSE");
-				
+
 				sto.setKindno(kindno);
 				sto.setPapano(papano);
 				sto.setMamano(mamano);
@@ -125,25 +136,22 @@ public class DbHelper {
 				sto.setRINGAT(RINGAT);
 				sto.setSELLAT(SELLAT);
 				sto.setGENDER(GENDER);
-				
-				
-				
-				
-				
+
 			}
-			
+
 			res.close();
-			
+
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(
+					AviculturaException.DB_CONNECT_FAILED, "database error: "
+							+ e.getLocalizedMessage(), e);
 		}
-		
+
 		return sto;
-		
+
 	}
 
-	public boolean checkImport() {
+	public boolean checkImport() throws AviculturaException {
 
 		boolean check = false;
 		int anzahl = 1;
@@ -162,8 +170,9 @@ public class DbHelper {
 			}
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(
+					AviculturaException.DB_CONNECT_FAILED, "database error: "
+							+ e.getLocalizedMessage(), e);
 		}
 
 		return check;
@@ -304,7 +313,7 @@ public class DbHelper {
 			throw new AviculturaException(
 					AviculturaException.DB_CONNECT_FAILED,
 					"can not close connect ", e);
-		} catch (NullPointerException  e) {
+		} catch (NullPointerException e) {
 			throw new AviculturaException(
 					AviculturaException.DB_CONNECT_FAILED,
 					"can not close connect a empty db", e);
@@ -318,8 +327,9 @@ public class DbHelper {
 			importStmt = con.prepareStatement(importSql);
 			importSpeciesStmt = con.prepareStatement(importSpeciesSql);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(
+					AviculturaException.DB_CONNECT_FAILED, "database error: "
+							+ e.getLocalizedMessage(), e);
 		}
 
 		File importFileData = new File(path + File.separator + "data.bbb");
@@ -339,17 +349,18 @@ public class DbHelper {
 
 	}
 
-	private Map<String, String> importSpeciesTable(File file) {
+	private Map<String, String> importSpeciesTable(File file)
+			throws AviculturaException {
 		Map<String, String> species = new HashMap<String, String>();
 
 		try {
 			// BufferedReader in = new BufferedReader(new FileReader(file));
-			BufferedReader in = new BufferedReader(new InputStreamReader(
+			BufferedReader inReader = new BufferedReader(new InputStreamReader(
 					new FileInputStream(file), "UTF-8"));
 			String line;
 			String[] tmp;
 
-			while ((line = in.readLine()) != null) {
+			while ((line = inReader.readLine()) != null) {
 				tmp = line.split("<=>");
 
 				if (tmp.length == 2) {
@@ -363,16 +374,18 @@ public class DbHelper {
 
 						species.put(tmp[0], uid);
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new AviculturaException(
+								AviculturaException.DB_CONNECT_FAILED,
+								"database error: " + e.getLocalizedMessage(), e);
 					}
 				}
 			}
 
-			in.close();
+			inReader.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(
+					AviculturaException.DB_CONNECT_FAILED, "database error: "
+							+ e.getLocalizedMessage(), e);
 		}
 
 		return species;
@@ -405,7 +418,6 @@ public class DbHelper {
 				log.info(date);
 				result = date.getTime();
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				result = 0;
 				log.error(datum + " " + result, e);
 			}
@@ -417,7 +429,7 @@ public class DbHelper {
 	public static final String DB_FIELDS = "BIRDDATAID, BIRDTYPEID, RINGNO, RINGTYPE, BREEDSTART, RINGAT, BUYAT, BUYADRESSE, SELLAT,"
 			+ " SELLADRESSE, DEATHAT, DEATHNOTE, MEDICSTART, MEDICNOTE, MEDICEND, MEDICCONTROL, DOC, OMBUDSMAN, OFFICE, GENDER, COLOR, BIRDFATHER, BIRDMOTHER";
 
-	public List<BirdObject> getBirdList() {
+	public List<BirdObject> getBirdList() throws AviculturaException {
 
 		List<BirdObject> list = new ArrayList<BirdObject>();
 
@@ -465,14 +477,15 @@ public class DbHelper {
 
 			res.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(
+					AviculturaException.DB_CONNECT_FAILED, "database error: "
+							+ e.getLocalizedMessage(), e);
 		}
 
 		return list;
 	}
 
-	public BirdObject getBirdEdit(String ringNo) {
+	public BirdObject getBirdEdit(String ringNo) throws AviculturaException {
 
 		BirdObject bird = new BirdObject();
 
@@ -518,8 +531,9 @@ public class DbHelper {
 
 			res.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(
+					AviculturaException.DB_CONNECT_FAILED, "database error: "
+							+ e.getLocalizedMessage(), e);
 		}
 
 		return bird;
@@ -542,7 +556,7 @@ public class DbHelper {
 		return pid;
 	}
 
-	public boolean birdHide(String ringNo) {
+	public boolean birdHide(String ringNo) throws AviculturaException {
 		boolean check = false;
 		try {
 			hideBirdByRingNoStmt.setLong(1, System.currentTimeMillis());
@@ -553,8 +567,9 @@ public class DbHelper {
 			}
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(
+					AviculturaException.DB_CONNECT_FAILED, "database error: "
+							+ e.getLocalizedMessage(), e);
 		}
 		return check;
 
@@ -626,7 +641,6 @@ public class DbHelper {
 
 			importStmt.execute();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 
 			log.error(bird.getRingNo() + " " + pid, e);
 			throw new AviculturaException(
@@ -692,7 +706,6 @@ public class DbHelper {
 
 						importStmt.execute();
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
 
 						log.error(iTmp[0] + " " + species.get(iTmp[0]), e);
 					}
@@ -703,7 +716,7 @@ public class DbHelper {
 
 			in.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			throw new AviculturaException(AviculturaException.IO_ERROR,
 					"can not read import file: " + file.getAbsolutePath(), e);
 		}
@@ -711,7 +724,7 @@ public class DbHelper {
 	}
 
 	public Map<Long, SearchResults> searchFor(String searchString,
-			String searchType) {
+			String searchType) throws AviculturaException {
 		// List<SearchResults> result = new ArrayList<SearchResults>();
 		Map<Long, SearchResults> result = new TreeMap<Long, SearchResults>();
 		ResultSet res = null;
@@ -729,7 +742,7 @@ public class DbHelper {
 						res.getLong("DEATHAT"), res.getString("BIRDDATAID"));
 
 				if (res.getLong("BREEDSTART") > 0) {
-					long key = res.getLong("RINGAT")*-1L;
+					long key = res.getLong("RINGAT") * -1L;
 
 					while (true) {
 						if (result.containsKey(key)) {
@@ -742,7 +755,7 @@ public class DbHelper {
 					result.put(key, search);
 
 				} else {
-					long key = res.getLong("BUYAT")*-1L;
+					long key = res.getLong("BUYAT") * -1L;
 
 					while (true) {
 						if (result.containsKey(key)) {
@@ -757,8 +770,9 @@ public class DbHelper {
 
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(
+					AviculturaException.DB_CONNECT_FAILED, "database error: "
+							+ e.getLocalizedMessage(), e);
 		}
 
 		return result;

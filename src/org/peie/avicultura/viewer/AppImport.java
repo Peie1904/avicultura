@@ -22,9 +22,11 @@ public class AppImport {
 	private static DbHelper dbhelper;
 
 	/**
+	 * @throws AviculturaException
 	 * @wbp.parser.entryPoint
 	 */
-	public static void importFromBBB(DbHelper dbhelperPara) {
+	public static void importFromBBB(DbHelper dbhelperPara)
+			throws AviculturaException {
 		JFrame importFrame = new JFrame("Import");
 		dbhelper = dbhelperPara;
 

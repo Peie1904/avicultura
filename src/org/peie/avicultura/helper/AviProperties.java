@@ -17,9 +17,6 @@ public class AviProperties extends Properties {
 		super.put(KEY_YEAR, df.format(date));
 	}
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public void put(String AviKey, String value) {

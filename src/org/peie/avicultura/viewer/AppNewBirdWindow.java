@@ -103,7 +103,6 @@ public class AppNewBirdWindow {
 
 		initIcons();
 
-		// TODO Auto-generated constructor stub
 	}
 
 	public AppNewBirdWindow(DbHelper dbhelper, JDesktopPane desktopPane,
@@ -118,8 +117,6 @@ public class AppNewBirdWindow {
 		this.properties = properties;
 
 		initIcons();
-
-		// TODO Auto-generated constructor stub
 	}
 
 	private void initIcons() {
@@ -146,8 +143,7 @@ public class AppNewBirdWindow {
 			iconSave = ImageIO.read(urlSave);
 			iconCopy = ImageIO.read(urlCopy);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("IO Error", e);
 		}
 	}
 
@@ -224,19 +220,19 @@ public class AppNewBirdWindow {
 			ringNo.setText(birdEditObj.getRingNo());
 			ringNo.setEditable(false);
 			speciesBox.setVisible(true);
-			
+
 			speciesBox.setSelectedItem(birdEditObj.getSpeciesID());
-			
+
 			lblSchnesittich.setVisible(false);
 			lblSchnesittich.setText(birdEditObj.getSpeciesID());
 			lblSchnesittich.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE_BOLD,
 					LABEL_FONT_SIZE));
-			//chckbxOffen.setEnabled(false);
+			// chckbxOffen.setEnabled(false);
 			if (birdEditObj.isRingType()) {
 				chckbxOffen.setSelected(true);
 			}
-			//male.setEnabled(false);
-			//female.setEnabled(false);
+			// male.setEnabled(false);
+			// female.setEnabled(false);
 			if (birdEditObj.isMale()) {
 				male.setSelected(true);
 				female.setSelected(false);
@@ -322,31 +318,26 @@ public class AppNewBirdWindow {
 
 			@Override
 			public void internalFrameActivated(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameDeactivated(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameDeiconified(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameIconified(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameOpened(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -387,7 +378,8 @@ public class AppNewBirdWindow {
 		internalFrame.getContentPane().add(lblRingNr);
 
 		ringNo = new JTextField();
-		ringNo.setText(properties.getProperty(AviProperties.KEY_RING_NO)+properties.getProperty(AviProperties.KEY_YEAR));
+		ringNo.setText(properties.getProperty(AviProperties.KEY_RING_NO)
+				+ properties.getProperty(AviProperties.KEY_YEAR));
 		ringNo.setBounds(238, 26, 86, 20);
 		internalFrame.getContentPane().add(ringNo);
 		ringNo.setColumns(10);
@@ -665,17 +657,17 @@ public class AppNewBirdWindow {
 		btnCopy = new JButton("Kopieren");
 		btnCopy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				BirdObject birdEditObj = dbhelper.getBirdEdit(ringNo.getText());
-				AppNewBirdWindow copyBird = new AppNewBirdWindow(dbhelper,
-						desktopPane, birdEditObj, properties);
-
+				BirdObject birdEditObj;
 				try {
+					birdEditObj = dbhelper.getBirdEdit(ringNo.getText());
+					AppNewBirdWindow copyBird = new AppNewBirdWindow(dbhelper,
+							desktopPane, birdEditObj, properties);
+
 					copyBird.openNewBird();
 					copyBird.fillCopySheet(iconCopy, "Neuer Vogel kopiert von "
 							+ ringNo.getText());
 				} catch (AviculturaException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					e.viewError(frame);
 				}
 
 			}
@@ -820,11 +812,9 @@ public class AppNewBirdWindow {
 						}
 					}
 				} catch (HeadlessException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					LOG.error("Headless error", e1);
 				} catch (AviculturaException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					e1.viewError(frame);
 				}
 
 			}
@@ -942,8 +932,7 @@ public class AppNewBirdWindow {
 
 			}
 		} catch (AviculturaException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e1.viewError(frame);
 		}
 	}
 }

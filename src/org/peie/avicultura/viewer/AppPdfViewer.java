@@ -27,6 +27,9 @@ import javax.swing.JPanel;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
+import org.apache.log4j.Logger;
+import org.peie.avicultura.helper.AviculturaException;
+
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import com.sun.pdfview.PDFPrintPage;
@@ -45,8 +48,9 @@ public class AppPdfViewer {
 	private File file;
 	private FileChannel channel;
 	private BufferedImage iconPdf;
+	private Logger LOG = Logger.getLogger(AppDateField.class);
 
-	public AppPdfViewer(JDesktopPane desktopPane) {
+	public AppPdfViewer(JDesktopPane desktopPane) throws AviculturaException {
 		this.desktopPane = desktopPane;
 		pageCountNow = 1;
 		internalFrame = new JInternalFrame();
@@ -56,57 +60,50 @@ public class AppPdfViewer {
 		try {
 			iconPdf = ImageIO.read(urlPdf);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			throw new AviculturaException(AviculturaException.IO_ERROR,
+					"IO error ", e1);
 		}
 
 		internalFrame.addInternalFrameListener(new InternalFrameListener() {
 
 			@Override
 			public void internalFrameOpened(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameIconified(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameDeiconified(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameDeactivated(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameClosing(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
+
 				try {
 					channel.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOG.error("IO error ", e);
 				}
 
 			}
 
 			@Override
 			public void internalFrameClosed(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameActivated(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -114,9 +111,10 @@ public class AppPdfViewer {
 	}
 
 	/**
+	 * @throws AviculturaException
 	 * @wbp.parser.entryPoint
 	 */
-	public void showPdf(File file) {
+	public void showPdf(File file) throws AviculturaException {
 		this.file = file;
 
 		internalFrame.getContentPane().setBackground(
@@ -183,7 +181,11 @@ public class AppPdfViewer {
 		buttonPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
-				print();
+				try {
+					print();
+				} catch (AviculturaException e) {
+					e.viewError(internalFrame);
+				}
 			}
 		});
 		buttonPrint.setBounds(350, 11, 89, 23);
@@ -237,14 +239,14 @@ public class AppPdfViewer {
 			// channel.close();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(AviculturaException.PDF_ERROR,
+					"IO error PDF Viewer ", e);
 
 		}
 
 	}
 
-	private void print() {
+	private void print() throws AviculturaException {
 		PDFPrintPage pages = new PDFPrintPage(pdffile);
 
 		// Create Print Job
@@ -271,8 +273,8 @@ public class AppPdfViewer {
 			}
 
 		} catch (PrinterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(AviculturaException.PDF_ERROR,
+					"IO error PDF Viewer ", e);
 		}
 	}
 }

@@ -320,8 +320,12 @@ public class Application {
 					searchText = searchTextField.getText();
 				}
 
-				openSearchFrame(searchText, comboBox.getSelectedItem()
-						.toString());
+				try {
+					openSearchFrame(searchText, comboBox.getSelectedItem()
+							.toString());
+				} catch (AviculturaException e1) {
+					e1.viewError(frame);
+				}
 			}
 		});
 
@@ -345,9 +349,15 @@ public class Application {
 				if (result == JFileChooser.APPROVE_OPTION) {
 					File datname = fileChooser.getSelectedFile();
 
-					AppPdfViewer pdfViewer = new AppPdfViewer(desktopPane);
+					AppPdfViewer pdfViewer;
+					try {
+						pdfViewer = new AppPdfViewer(desktopPane);
+						pdfViewer.showPdf(datname);
+					} catch (AviculturaException e1) {
+						e1.viewError(frame);
+					}
 
-					pdfViewer.showPdf(datname);
+					
 				}
 
 			}
@@ -377,12 +387,19 @@ public class Application {
 
 					ZuchtBuchWriter writer = new ZuchtBuchWriter();
 
-					List<BirdObject> list = dbhelper.getBirdList();
-					writer.createZuchtBuch(list, datname);
+					List<BirdObject> list;
+					try {
+						list = dbhelper.getBirdList();
+						writer.createZuchtBuch(list, datname);
 
-					AppPdfViewer pdfViewer = new AppPdfViewer(desktopPane);
+						AppPdfViewer pdfViewer = new AppPdfViewer(desktopPane);
 
-					pdfViewer.showPdf(datname);
+						pdfViewer.showPdf(datname);
+					} catch (AviculturaException e1) {
+
+						e1.viewError(frame);
+					}
+
 				}
 
 			}
@@ -395,8 +412,7 @@ public class Application {
 				try {
 					newBirdWindow.openNewBird();
 				} catch (AviculturaException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					e1.viewError(frame);
 				}
 
 			}
@@ -406,7 +422,11 @@ public class Application {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				AppImport.importFromBBB(dbhelper);
+				try {
+					AppImport.importFromBBB(dbhelper);
+				} catch (AviculturaException e1) {
+					e1.viewError(frame);
+				}
 
 			}
 		});
@@ -479,36 +499,31 @@ public class Application {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 				try {
 					frame.setSelected(true);
 				} catch (PropertyVetoException e1) {
-					// TODO Auto-generated catch block
+					LOG.error("frame error: ", e1);
 					e1.printStackTrace();
 				}
 			}
@@ -518,7 +533,8 @@ public class Application {
 
 	}
 
-	private void openSearchFrame(String searchString, String searchType) {
+	private void openSearchFrame(String searchString, String searchType)
+			throws AviculturaException {
 		Dimension screenDesktop = desktopPane.getSize();
 
 		int heigth = screenDesktop.height - 200;
@@ -575,31 +591,26 @@ public class Application {
 
 			@Override
 			public void internalFrameActivated(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameDeactivated(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameDeiconified(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameIconified(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void internalFrameOpened(InternalFrameEvent arg0) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -630,7 +641,6 @@ public class Application {
 		});
 
 		table.setAutoCreateRowSorter(true);
-	
 
 		table.getColumnModel().getColumn(6).setPreferredWidth(95);
 
@@ -638,25 +648,21 @@ public class Application {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 
@@ -708,7 +714,7 @@ public class Application {
 		PopupMenuExample();
 	}
 
-	private void editBird(String ringNo) {
+	private void editBird(String ringNo) throws AviculturaException {
 		int check = JOptionPane.showConfirmDialog(frame, "Ring Nr.: " + ringNo,
 				"Vogel bearbeiten?", JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE, new ImageIcon(iconEditBig));
@@ -721,14 +727,13 @@ public class Application {
 				editWindow.openNewBird();
 				editWindow.fillDataSheet(iconEdit, "Bearbeite Vogel " + ringNo);
 			} catch (AviculturaException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e.viewError(frame);
 			}
 
 		}
 	}
 
-	private void copyBird(String ringNo) {
+	private void copyBird(String ringNo) throws AviculturaException {
 		int check = JOptionPane.showConfirmDialog(frame, "Ring Nr.: " + ringNo,
 				"Vogel kopieren?", JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE, new ImageIcon(iconEditBig));
@@ -742,14 +747,13 @@ public class Application {
 				copyWindow.fillCopySheet(iconCopy, "Neuer Vogel kopiert von "
 						+ ringNo);
 			} catch (AviculturaException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e.viewError(frame);
 			}
 
 		}
 	}
 
-	private void deleteBird(String ringNo) {
+	private void deleteBird(String ringNo) throws AviculturaException {
 		int check = JOptionPane.showConfirmDialog(frame, "Ring Nr.: " + ringNo,
 				"Vogel löschen?", JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE, new ImageIcon(iconDelete));
@@ -763,16 +767,43 @@ public class Application {
 			}
 		}
 	}
-	
-	private void createJungTierStammBlatt(String ringNo){
+
+	private void createJungTierStammBlatt(String ringNo)
+			throws AviculturaException {
 		StammBlattObj sto = dbhelper.getStammBlattData(ringNo);
-		
-		File pdfFile = new File("Stammblatt-"+ringNo+".pdf");
-		
-		StammBlattWriter stamm = new StammBlattWriter(sto, pdfFile);
-		
-		stamm.writer();
-		
+
+		if (sto != null) {
+
+			JFileChooser fileChooser = new JFileChooser();
+
+			// fileChooser.setCurrentDirectory(new File(path));
+
+			// fileChooser.setApproveButtonText("Speichern");
+			fileChooser.setMultiSelectionEnabled(false);
+			// fileChooser.setFileFilter(filter);
+			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			// fileChooser.setSelectedFile(new File(path, pdfName));
+
+			int result = fileChooser.showOpenDialog(frame);
+			if (result == JFileChooser.APPROVE_OPTION) {
+				File pdfFile = new File(fileChooser.getSelectedFile(),
+						"Stammblatt-" + ringNo + ".pdf");
+
+				StammBlattWriter stamm = new StammBlattWriter(sto, pdfFile);
+
+				stamm.writer();
+
+				JOptionPane.showMessageDialog(frame, pdfFile.getAbsolutePath(),
+						"Jungtierstammblatt gespeichert",
+						JOptionPane.ERROR_MESSAGE, new ImageIcon(iconPdf));
+			}
+
+		} else {
+			JOptionPane.showMessageDialog(frame, "Ringnr.: " + ringNo,
+					"Keine Eltern eingetragen", JOptionPane.ERROR_MESSAGE,
+					new ImageIcon(iconError));
+		}
+
 	}
 
 	public JPopupMenu popup;
@@ -786,21 +817,29 @@ public class Application {
 		ActionListener menuListener = new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 
-				if (event.getActionCommand().toString().equals(BEARBEITEN)) {
-					editBird(popUpLabel.getText());
-				}
+				try {
 
-				if (event.getActionCommand().toString().equals(KOPIEREN)) {
-					copyBird(popUpLabel.getText());
-				}
+					if (event.getActionCommand().toString().equals(BEARBEITEN)) {
+						editBird(popUpLabel.getText());
+					}
 
-				if (event.getActionCommand().toString().equals(LOESCHEN)) {
-					deleteBird(popUpLabel.getText());
-				}
-				
-				if (event.getActionCommand().toString().equals(JUNGTIERSTAMMBLATT)) {
-					LOG.info(JUNGTIERSTAMMBLATT+" "+popUpLabel.getText());
-					createJungTierStammBlatt(popUpLabel.getText());
+					if (event.getActionCommand().toString().equals(KOPIEREN)) {
+						copyBird(popUpLabel.getText());
+					}
+
+					if (event.getActionCommand().toString().equals(LOESCHEN)) {
+						deleteBird(popUpLabel.getText());
+					}
+
+					if (event.getActionCommand().toString()
+							.equals(JUNGTIERSTAMMBLATT)) {
+						LOG.info(JUNGTIERSTAMMBLATT + " "
+								+ popUpLabel.getText());
+						createJungTierStammBlatt(popUpLabel.getText());
+					}
+
+				} catch (AviculturaException e) {
+
 				}
 			}
 		};
@@ -812,17 +851,18 @@ public class Application {
 		item.setHorizontalTextPosition(JMenuItem.RIGHT);
 		item.addActionListener(menuListener);
 		item.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE, LABEL_FONT_SIZE));
-		
+
 		popup.add(item = new JMenuItem(KOPIEREN, new ImageIcon(iconCopy)));
 		item.setHorizontalTextPosition(JMenuItem.RIGHT);
 		item.addActionListener(menuListener);
 		item.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE, LABEL_FONT_SIZE));
-		
-		popup.add(item = new JMenuItem(JUNGTIERSTAMMBLATT, new ImageIcon(iconPdf)));
+
+		popup.add(item = new JMenuItem(JUNGTIERSTAMMBLATT, new ImageIcon(
+				iconPdf)));
 		item.setHorizontalTextPosition(JMenuItem.RIGHT);
 		item.addActionListener(menuListener);
 		item.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE, LABEL_FONT_SIZE));
-		
+
 		popup.add(item = new JMenuItem(LOESCHEN, new ImageIcon(iconDelete)));
 		item.setHorizontalTextPosition(JMenuItem.RIGHT);
 		item.addActionListener(menuListener);

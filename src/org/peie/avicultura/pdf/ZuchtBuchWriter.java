@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.peie.avicultura.helper.AviculturaException;
 import org.peie.avicultura.helper.BirdObject;
 import org.peie.avicultura.helper.Helper;
 
@@ -724,7 +725,8 @@ public class ZuchtBuchWriter {
 		return out;
 	}
 
-	public void createZuchtBuch(List<BirdObject> list, File pdf) {
+	public void createZuchtBuch(List<BirdObject> list, File pdf)
+			throws AviculturaException {
 
 		String[][] data = new String[list.size()][24];
 
@@ -838,14 +840,14 @@ public class ZuchtBuchWriter {
 			print_pdf(pdf.getAbsolutePath(), data);
 			// printBestandsListe("fire2.pdf", data);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(AviculturaException.IO_ERROR,
+					"file not found error", e);
 		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(AviculturaException.IO_ERROR,
+					"Document error", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(AviculturaException.IO_ERROR,
+					"IO error", e);
 		}
 
 	}
@@ -856,7 +858,6 @@ public class ZuchtBuchWriter {
 	 */
 	public void execute(String[] args) throws DocumentException,
 			FileNotFoundException, IOException {
-		// TODO code application logic here
 
 		String[][] data;
 		BufferedReader infile;

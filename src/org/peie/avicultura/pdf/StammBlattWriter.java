@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.peie.avicultura.helper.AviculturaException;
 import org.peie.avicultura.helper.Helper;
 import org.peie.avicultura.helper.StammBlattObj;
 
@@ -29,7 +30,8 @@ public class StammBlattWriter {
 	private Document document;
 	private StammBlattObj sto;
 
-	public StammBlattWriter(StammBlattObj sto, File pdfFile) {
+	public StammBlattWriter(StammBlattObj sto, File pdfFile)
+			throws AviculturaException {
 
 		this.sto = sto;
 
@@ -38,16 +40,16 @@ public class StammBlattWriter {
 		try {
 			PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(AviculturaException.IO_ERROR,
+					"File not found error ", e);
 		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(AviculturaException.IO_ERROR,
+					"document error ", e);
 		}
 
 	}
 
-	public void writer() {
+	public void writer() throws AviculturaException {
 
 		document.open();
 
@@ -57,13 +59,11 @@ public class StammBlattWriter {
 			BaseFont helvetica_oblique = BaseFont.createFont(
 					BaseFont.HELVETICA_OBLIQUE, BaseFont.CP1252,
 					BaseFont.EMBEDDED);
-			BaseFont times = BaseFont.createFont(BaseFont.TIMES_ROMAN,
-					BaseFont.CP1252, BaseFont.EMBEDDED);
+
 			BaseFont helveticaBold = BaseFont
 					.createFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1252,
 							BaseFont.EMBEDDED);
 
-			Font contain_font = new Font(times, 8, Font.ITALIC);
 			Font font_small = new Font(helvetica, 10, Font.NORMAL);
 			Font font_small_italic = new Font(helvetica_oblique, 10,
 					Font.ITALIC);
@@ -319,11 +319,11 @@ public class StammBlattWriter {
 			document.add(table);
 
 		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(AviculturaException.IO_ERROR,
+					"document error ", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AviculturaException(AviculturaException.IO_ERROR,
+					"File not found error ", e);
 		}
 
 		document.close();

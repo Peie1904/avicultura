@@ -15,7 +15,7 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 
 public class Helper {
-	
+
 	private static final String DB = "db";
 	public static final String DBFOLDER = "DBFOLDER";
 	private static Logger LOG = Logger.getLogger(Helper.class);
@@ -136,49 +136,47 @@ public class Helper {
 
 		return check;
 	}
-	
-	public static String getGenderStr(double gender){
-		if (gender == 1.0){
+
+	public static String getGenderStr(double gender) {
+		if (gender == 1.0) {
 			return "Hahn";
-		}else{
+		} else {
 			return "Henne";
 		}
 	}
-	
-	public static Properties parseArgs(String[] args){
+
+	public static Properties parseArgs(String[] args) {
 		Properties props = new Properties();
-		
+
 		Options options = new Options();
-		
+
 		options.addOption(DB, true, "database folder");
-		
+
 		CommandLineParser parser = new PosixParser();
 		CommandLine cmd = null;
 		try {
-			cmd = parser.parse( options, args);
+			cmd = parser.parse(options, args);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("parser error", e);
 		}
-		
-		if (cmd.hasOption(DB)){
-			LOG.info("Use standard DB folder "+cmd.getOptionValue(DB));
+
+		if (cmd.hasOption(DB)) {
+			LOG.info("Use standard DB folder " + cmd.getOptionValue(DB));
 			File f = new File(cmd.getOptionValue(DB));
-			
-			if(f.exists()){
+
+			if (f.exists()) {
 				props.setProperty(DBFOLDER, f.getAbsolutePath());
-			}else{
-				LOG.error("Use standard DB folder because of none existing db folder: "+f.getAbsolutePath());
+			} else {
+				LOG.error("Use standard DB folder because of none existing db folder: "
+						+ f.getAbsolutePath());
 				props.setProperty(DBFOLDER, System.getenv("APPDATA"));
 			}
-			
-			
-		}else{
+
+		} else {
 			LOG.info("Use standard DB folder");
 			props.setProperty(DBFOLDER, System.getenv("APPDATA"));
 		}
-		
-		
+
 		return props;
 	}
 }

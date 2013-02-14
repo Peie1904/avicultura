@@ -6,6 +6,7 @@ import java.io.File;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.peie.avicultura.helper.AviculturaException;
 import org.peie.avicultura.helper.StammBlattObj;
 
 public class StammBlattWriterTest {
@@ -45,7 +46,7 @@ public class StammBlattWriterTest {
 	
 
 	@Test
-	public void testWriter() {
+	public void testWriter() throws AviculturaException {
 		writer.writer();
 	}
 

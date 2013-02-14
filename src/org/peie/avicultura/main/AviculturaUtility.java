@@ -28,12 +28,10 @@ public abstract class AviculturaUtility {
 		} else {
 			dbhelper = new DbHelper(false);
 		}
-		
+
 		properties = new AviProperties();
-		
+
 		properties.put(AviProperties.KEY_RING_NO, "18489");
-		
-		
 
 	}
 

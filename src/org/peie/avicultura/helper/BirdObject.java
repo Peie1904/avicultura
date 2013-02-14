@@ -43,8 +43,6 @@ public class BirdObject {
 		super();
 		textPanes = new LinkedList<JTextPane>();
 		textFields = new LinkedList<JTextField>();
-
-		// TODO Auto-generated constructor stub
 	}
 
 	public BirdObject(String speciesID, String newSpecies, String ringNo,
