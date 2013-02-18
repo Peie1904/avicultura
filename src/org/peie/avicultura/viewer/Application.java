@@ -208,6 +208,10 @@ public class Application {
 		JMenuItem mntmNeuerVogel = new JMenuItem("Neuer Vogel");
 		mntmNeuerVogel.setIcon(new ImageIcon(iconNewBird));
 		mnDatei.add(mntmNeuerVogel);
+		
+		JMenuItem mntmZuchtpaare = new JMenuItem("Zuchtpaare");
+		mntmZuchtpaare.setIcon(new ImageIcon(iconFindBird));
+		mnDatei.add(mntmZuchtpaare);
 
 		mnDatei.addSeparator();
 
@@ -307,6 +311,24 @@ public class Application {
 				}
 
 				System.exit(0);
+			}
+		});
+		
+		mntmZuchtpaare.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				System.out.println("ZUCHTPAARE");
+				
+				ZuchtPaareFrame zpf = new ZuchtPaareFrame(desktopPane,dbhelper);
+				
+				try {
+					zpf.showInternalFrame();
+				} catch (AviculturaException e1) {
+					e1.viewError(frame);
+				}
+
 			}
 		});
 

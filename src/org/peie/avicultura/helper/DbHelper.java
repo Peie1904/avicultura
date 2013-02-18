@@ -62,16 +62,21 @@ public class DbHelper {
 			+ "and papa.RINGNO = TRIM(LEFT(kind.BIRDFATHER,POSITION(' ',kind.BIRDFATHER))) "
 			+ "and mama.RINGNO = TRIM(LEFT(kind.BIRDMOTHER,POSITION(' ',kind.BIRDMOTHER))) "
 			+ "and art.BIRDTYPEID = kind.BIRDTYPEID and kind.MODFLAG = 0";
-
-	/*
-	 * select distinct kind.BIRDFATHER,kind.BIRDMOTHER from BIRDDATA
-	 * kind,BIRDDATA papa, BIRDDATA mama where LENGTH(kind.BIRDFATHER) > 3 and
-	 * LEngth(kind.BIRDMOTHER) > 3 and kind.MODFLAG = 0 and papa.RINGNO =
-	 * TRIM(LEFT(kind.BIRDFATHER,POSITION(' ',kind.BIRDFATHER))) and mama.RINGNO
-	 * = TRIM(LEFT(kind.BIRDMOTHER,POSITION(' ',kind.BIRDMOTHER)))
-	 */
-
 	private PreparedStatement selectStammBlattStmt;
+	private static final String selectZuchtPaareSql = "select distinct papa.RINGNO paparing, "
+			+ "TRIM(RIGHT(kind.BIRDFATHER,LENGTH(kind.BIRDFATHER)-POSITION(' ',kind.BIRDFATHER))) papavogel, "
+			+ "papa.COLOR papafarbe, "
+			+ "mama.RINGNO mamaring, "
+			+ "TRIM(RIGHT(kind.BIRDMOTHER,LENGTH(kind.BIRDMOTHER)-POSITION(' ',kind.BIRDMOTHER))) mamavogel, "
+			+ "mama.COLOR mamafarbe "
+			+ "from BIRDDATA kind,BIRDDATA papa, BIRDDATA mama "
+			+ "where LENGTH(kind.BIRDFATHER) > 3 "
+			+ "and LEngth(kind.BIRDMOTHER) > 3 "
+			+ "and kind.MODFLAG = 0 "
+			+ "and papa.RINGNO = TRIM(LEFT(kind.BIRDFATHER,POSITION(' ',kind.BIRDFATHER))) "
+			+ "and mama.RINGNO = TRIM(LEFT(kind.BIRDMOTHER,POSITION(' ',kind.BIRDMOTHER))) "
+			+ "order by papa.RINGNO,mama.RINGNO";
+	private PreparedStatement selectZuchtPaareStmt;
 
 	public DbHelper(boolean newDb) throws AviculturaException {
 
@@ -95,11 +100,51 @@ public class DbHelper {
 			seletctListStmt = con.prepareStatement(selectListSql);
 			hideBirdByRingNoStmt = con.prepareStatement(hideBirdByRingNoSql);
 			selectStammBlattStmt = con.prepareStatement(selectStammBlattSql);
+			selectZuchtPaareStmt = con.prepareStatement(selectZuchtPaareSql);
 		} catch (SQLException e) {
 			throw new AviculturaException(
 					AviculturaException.DB_CONNECT_FAILED,
 					"preparation failed", e);
 		}
+
+	}
+
+	public List<ZuchtPaareObj> getZuchtPaareData() throws AviculturaException {
+
+		List<ZuchtPaareObj> zpoList = new ArrayList<ZuchtPaareObj>();
+
+		ResultSet res;
+		try {
+			res = selectZuchtPaareStmt.executeQuery();
+
+			while (res.next()) {
+				ZuchtPaareObj zpo = new ZuchtPaareObj();
+				String paparing = res.getString("paparing");
+				String papavogel = res.getString("papavogel");
+				String papafarbe = res.getString("papafarbe");
+				String mamaring = res.getString("mamaring");
+				String mamavogel = res.getString("mamavogel");
+				String mamafarbe = res.getString("mamafarbe");
+
+				zpo.setPaparing(paparing);
+				zpo.setPapavogel(papavogel);
+				zpo.setPapafarbe(papafarbe);
+				zpo.setMamaring(mamaring);
+				zpo.setMamavogel(mamavogel);
+				zpo.setMamafarbe(mamafarbe);
+				
+				zpoList.add(zpo);
+			}
+
+			res.close();
+		} catch (SQLException e) {
+			log.error("database error: ", e);
+			throw new AviculturaException(
+					AviculturaException.SQL_EXECUTION_FAILED,
+					"database error: " + e.getLocalizedMessage(), e);
+		}
+
+		return zpoList;
 
 	}
 
@@ -306,6 +351,7 @@ public class DbHelper {
 			seletctListStmt.close();
 			hideBirdByRingNoStmt.close();
 			selectStammBlattStmt.close();
+			selectZuchtPaareStmt.close();
 			con.close();
 
 			log.info("close database");
