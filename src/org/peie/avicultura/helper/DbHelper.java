@@ -32,6 +32,7 @@ public class DbHelper {
 	public static final String SQL_COMMENT_INDICATOR = "#";
 	public static final String SQL_COMMENT_INDICATOR_2 = "--";
 	public static final String SQL_COMMENT_INDICATOR_3 = "REM ";
+	public static final String TABLE_BIRDPAIR = "BIRDPAIR";
 
 	private static final String importSql = "insert into birddata values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	private PreparedStatement importStmt;
@@ -77,6 +78,19 @@ public class DbHelper {
 			+ "and mama.RINGNO = TRIM(LEFT(kind.BIRDMOTHER,POSITION(' ',kind.BIRDMOTHER))) "
 			+ "order by papa.RINGNO,mama.RINGNO";
 	private PreparedStatement selectZuchtPaareStmt;
+	private static final String selectBirdPairSql = "select * from "
+			+ TABLE_BIRDPAIR
+			+ " where birdPairFATHER = ? and birdPairMOTHER = ?";
+	private PreparedStatement selectBirdPairStmt;
+	private static final String insertBirdPairSql = "insert into "
+			+ TABLE_BIRDPAIR + " (birdPairFATHER,birdPairMOTHER) values (?,?)";
+	private PreparedStatement insertBirdPairStmt;
+
+	private static final String createTabeBirdPair = "create table `"
+			+ TABLE_BIRDPAIR + "` " + "(`birdPairId` bigint auto_increment,"
+			+ "`birdPairFATHER` VARCHAR(35) DEFAULT NULL,"
+			+ "`birdPairMOTHER` VARCHAR(35) DEFAULT NULL,"
+			+ "PRIMARY KEY (`birdPairId`))";
 
 	public DbHelper(boolean newDb) throws AviculturaException {
 
@@ -101,6 +115,11 @@ public class DbHelper {
 			hideBirdByRingNoStmt = con.prepareStatement(hideBirdByRingNoSql);
 			selectStammBlattStmt = con.prepareStatement(selectStammBlattSql);
 			selectZuchtPaareStmt = con.prepareStatement(selectZuchtPaareSql);
+			
+			createZuchtPaarTable();
+			
+			selectBirdPairStmt = con.prepareStatement(selectBirdPairSql);
+			insertBirdPairStmt = con.prepareStatement(insertBirdPairSql);
 		} catch (SQLException e) {
 			throw new AviculturaException(
 					AviculturaException.DB_CONNECT_FAILED,
@@ -109,7 +128,131 @@ public class DbHelper {
 
 	}
 
+	private boolean existsTable(String tableName) throws AviculturaException {
+		boolean check = false;
+
+		try {
+			ResultSet tables = con.getMetaData().getTables(con.getCatalog(),
+					null, null, null);
+
+			while (tables.next()) {
+				String table = tables.getString(3);
+
+				log.info(tables.getString(3));
+
+				if (table.equals(tableName)) {
+					check = true;
+				}
+
+			}
+
+			tables.close();
+
+		} catch (SQLException e) {
+			log.error("get table error", e);
+			throw new AviculturaException(
+					AviculturaException.SQL_EXECUTION_FAILED,
+					"get table error", e);
+		}
+
+		return check;
+	}
+	
+	private int getPairNo(ZuchtPaareObj zuchtPaareObj) throws AviculturaException{
+		return getPairNo(zuchtPaareObj.getPaparing(), zuchtPaareObj.getMamaring());
+	}
+
+	private int getPairNo(String paparing,String mamaring) throws AviculturaException {
+		int pairNo = 0;
+		try {
+			selectBirdPairStmt.setString(1, paparing);
+
+			selectBirdPairStmt.setString(2, mamaring);
+
+			ResultSet res = selectBirdPairStmt.executeQuery();
+
+			while (res.next()) {
+				pairNo = res.getInt("birdPairId");
+			}
+
+			res.close();
+
+		} catch (SQLException e) {
+			log.info("pair there error", e);
+			throw new AviculturaException(
+					AviculturaException.SQL_EXECUTION_FAILED,
+					"pair there error", e);
+		}
+
+		log.info(paparing + " + "
+				+ mamaring + " = " + pairNo);
+
+		return pairNo;
+	}
+
+	public void createZuchtPaarTable() throws AviculturaException {
+
+		boolean tableExists = existsTable(TABLE_BIRDPAIR);
+
+		log.info(tableExists);
+
+		if (!tableExists) {
+			try {
+				PreparedStatement createSql = con
+						.prepareStatement(createTabeBirdPair);
+
+				log.info(createTabeBirdPair);
+
+				createSql.execute();
+
+				createSql.close();
+
+			} catch (SQLException e) {
+				log.error("create BIRDPAIRS table error", e);
+				throw new AviculturaException(
+						AviculturaException.SQL_EXECUTION_FAILED,
+						"create BIRDPAIRS table error", e);
+			}
+		}
+
+		
+
+	}
+	
+	public void fillPairTables() throws AviculturaException{
+		List<ZuchtPaareObj> birdPairs = getZuchtPaareData();
+
+		try {
+			for (ZuchtPaareObj zuchtPaareObj : birdPairs) {
+				boolean pairThere = false;
+
+				if (getPairNo(zuchtPaareObj) != 0){
+					pairThere = true;
+					log.info("pair there");
+				}
+
+				if (!pairThere) {
+					insertBirdPairStmt
+							.setString(1, zuchtPaareObj.getPaparing());
+					insertBirdPairStmt
+							.setString(2, zuchtPaareObj.getMamaring());
+
+					insertBirdPairStmt.execute();
+				}
+
+			}
+
+		} catch (SQLException e) {
+			log.info("pair there error", e);
+			throw new AviculturaException(
+					AviculturaException.SQL_EXECUTION_FAILED,
+					"pair there error", e);
+		}
+	}
+
 	public List<ZuchtPaareObj> getZuchtPaareData() throws AviculturaException {
+
+		// createZuchtPaarTable();
 
 		List<ZuchtPaareObj> zpoList = new ArrayList<ZuchtPaareObj>();
 
@@ -125,6 +268,8 @@ public class DbHelper {
 				String mamaring = res.getString("mamaring");
 				String mamavogel = res.getString("mamavogel");
 				String mamafarbe = res.getString("mamafarbe");
+				
+				int birdpairno = getPairNo(paparing,mamaring);
 
 				zpo.setPaparing(paparing);
 				zpo.setPapavogel(papavogel);
@@ -132,7 +277,8 @@ public class DbHelper {
 				zpo.setMamaring(mamaring);
 				zpo.setMamavogel(mamavogel);
 				zpo.setMamafarbe(mamafarbe);
-				
+				zpo.setBirdpairno(birdpairno);
+
 				zpoList.add(zpo);
 			}
 
@@ -352,6 +498,8 @@ public class DbHelper {
 			hideBirdByRingNoStmt.close();
 			selectStammBlattStmt.close();
 			selectZuchtPaareStmt.close();
+			selectBirdPairStmt.close();
+			insertBirdPairStmt.close();
 			con.close();
 
 			log.info("close database");

@@ -50,6 +50,8 @@ public class ZuchtPaareFrame {
 		
 		desktopPane.add(internalFrame);
 		
+		dbhelper.fillPairTables();
+		
 		List<ZuchtPaareObj> zpoList = dbhelper.getZuchtPaareData();
 		
 		final Object[][] inTable = new Object[zpoList.size()][8];
@@ -58,13 +60,14 @@ public class ZuchtPaareFrame {
 		
 		for (ZuchtPaareObj zpo : zpoList) {
 			
-			inTable[i][0] = zpo.getPaparing();
-			inTable[i][1] = zpo.getPapavogel();
-			inTable[i][2] = zpo.getPapafarbe();
+			inTable[i][0] = zpo.getBirdpairno();
+			inTable[i][1] = zpo.getPaparing();
+			inTable[i][2] = zpo.getPapavogel();
+			inTable[i][3] = zpo.getPapafarbe();
 			
-			inTable[i][3] = zpo.getMamaring();
-			inTable[i][4] = zpo.getMamavogel();
-			inTable[i][5] = zpo.getMamafarbe();
+			inTable[i][4] = zpo.getMamaring();
+			inTable[i][5] = zpo.getMamavogel();
+			inTable[i][6] = zpo.getMamafarbe();
 			
 			i++;
 		}
@@ -72,12 +75,12 @@ public class ZuchtPaareFrame {
 		table = new JTable();
 
 		table.setModel(new DefaultTableModel(inTable, new String[] {
-				"Vater Ringnr.","Vater Art","Vater Farbe","Mutter Ringnr.","Mutter Art","Mutter Farbe" }) {
+				"Zuchtpaar","Vater Ringnr.","Vater Art","Vater Farbe","Mutter Ringnr.","Mutter Art","Mutter Farbe" }) {
 			/**
 					 * 
 					 */
 			private static final long serialVersionUID = 1L;
-			Class[] columnTypes = new Class[] { String.class, String.class,
+			Class[] columnTypes = new Class[] { Integer.class,String.class, String.class,
 					Object.class, Object.class, Object.class, Object.class,
 					Object.class, Long.class };
 
