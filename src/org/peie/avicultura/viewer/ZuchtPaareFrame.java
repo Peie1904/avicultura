@@ -4,13 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.List;
 
-import javax.swing.ImageIcon;
+
 import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
+
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import org.peie.avicultura.helper.AviInternalFrame;
 import org.peie.avicultura.helper.AviculturaException;
 import org.peie.avicultura.helper.DbHelper;
 import org.peie.avicultura.helper.ZuchtPaareObj;
@@ -20,11 +22,13 @@ public class ZuchtPaareFrame {
 	private JDesktopPane desktopPane;
 	private DbHelper dbhelper;
 	private JTable table;
+	private JPanel taskBar;
 
-	public ZuchtPaareFrame(JDesktopPane desktopPane,DbHelper dbhelper) {
+	public ZuchtPaareFrame(JDesktopPane desktopPane,DbHelper dbhelper,JPanel taskBar) {
 		super();
 		this.desktopPane = desktopPane;
 		this.dbhelper = dbhelper;
+		this.taskBar = taskBar;
 	}
 	
 	public void showInternalFrame() throws AviculturaException{
@@ -36,7 +40,7 @@ public class ZuchtPaareFrame {
 
 		Dimension minSize = new Dimension(700, 500);
 		
-		final JInternalFrame internalFrame = new JInternalFrame(
+		final AviInternalFrame internalFrame = new AviInternalFrame(taskBar,
 				"Zuchtpaare");
 		//internalFrame.setFrameIcon(new ImageIcon(iconFindBird));
 		internalFrame.setClosable(true);

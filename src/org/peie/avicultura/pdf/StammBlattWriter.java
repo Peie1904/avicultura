@@ -123,7 +123,7 @@ public class StammBlattWriter {
 			cell.setPadding(PADDING);
 
 			table.addCell(cell);
-			chunk = new Chunk("Schlupf am", font_small_italic);
+			chunk = new Chunk("Beringt am", font_small_italic);
 
 			cell = new PdfPCell(new Paragraph(chunk));
 			cell.setHorizontalAlignment(Element.ALIGN_LEFT);

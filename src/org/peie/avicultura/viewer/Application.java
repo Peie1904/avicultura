@@ -103,6 +103,7 @@ public class Application {
 	private BufferedImage icon, iconNewBird, iconFindBird, iconError,
 			iconDelete, iconEdit, iconEditBig;
 	private JPanel navigator;
+	private JPanel taskbar;
 	private static final JPanel navigatorPanel = new JPanel();
 	private List<JLabel> navLables = new LinkedList<JLabel>();
 	private AppNewBirdWindow newBirdWindow;
@@ -208,7 +209,7 @@ public class Application {
 		JMenuItem mntmNeuerVogel = new JMenuItem("Neuer Vogel");
 		mntmNeuerVogel.setIcon(new ImageIcon(iconNewBird));
 		mnDatei.add(mntmNeuerVogel);
-		
+
 		JMenuItem mntmZuchtpaare = new JMenuItem("Zuchtpaare");
 		mntmZuchtpaare.setIcon(new ImageIcon(iconFindBird));
 		mnDatei.add(mntmZuchtpaare);
@@ -286,9 +287,12 @@ public class Application {
 
 		navigator.add(tabBrowser, BorderLayout.CENTER);
 
-		frame.getContentPane().add(navigator, BorderLayout.WEST);
+		//frame.getContentPane().add(navigator, BorderLayout.WEST);
+		
+		taskbar = new JPanel();
 
 		frame.getContentPane().add(desktopPane, BorderLayout.CENTER);
+		frame.getContentPane().add(taskbar, BorderLayout.SOUTH);
 
 		/*
 		 * try { newBirdWindow.openNewBird(); } catch (AviculturaException e1) {
@@ -313,16 +317,16 @@ public class Application {
 				System.exit(0);
 			}
 		});
-		
+
 		mntmZuchtpaare.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				System.out.println("ZUCHTPAARE");
-				
-				ZuchtPaareFrame zpf = new ZuchtPaareFrame(desktopPane,dbhelper);
-				
+
+				ZuchtPaareFrame zpf = new ZuchtPaareFrame(desktopPane, dbhelper,taskbar);
+
 				try {
 					zpf.showInternalFrame();
 				} catch (AviculturaException e1) {
@@ -379,7 +383,6 @@ public class Application {
 						e1.viewError(frame);
 					}
 
-					
 				}
 
 			}
@@ -818,6 +821,12 @@ public class Application {
 				JOptionPane.showMessageDialog(frame, pdfFile.getAbsolutePath(),
 						"Jungtierstammblatt gespeichert",
 						JOptionPane.ERROR_MESSAGE, new ImageIcon(iconPdf));
+
+				AppPdfViewer pdfviewer;
+
+				pdfviewer = new AppPdfViewer(desktopPane);
+
+				pdfviewer.showPdf(pdfFile);
 			}
 
 		} else {
