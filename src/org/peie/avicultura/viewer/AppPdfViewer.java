@@ -21,13 +21,14 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
+//import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 import org.apache.log4j.Logger;
+import org.peie.avicultura.helper.AviInternalFrame;
 import org.peie.avicultura.helper.AviculturaException;
 
 import com.sun.pdfview.PDFFile;
@@ -37,7 +38,7 @@ import com.sun.pdfview.PagePanel;
 
 public class AppPdfViewer {
 
-	private JInternalFrame internalFrame;
+	private AviInternalFrame internalFrame;
 	private JDesktopPane desktopPane;
 	private JPanel scrollPane;
 	private PagePanel panel;
@@ -50,10 +51,10 @@ public class AppPdfViewer {
 	private BufferedImage iconPdf;
 	private Logger LOG = Logger.getLogger(AppDateField.class);
 
-	public AppPdfViewer(JDesktopPane desktopPane) throws AviculturaException {
+	public AppPdfViewer(JDesktopPane desktopPane,JPanel taskbar) throws AviculturaException {
 		this.desktopPane = desktopPane;
 		pageCountNow = 1;
-		internalFrame = new JInternalFrame();
+		internalFrame = new AviInternalFrame(taskbar);
 		URL urlPdf = ClassLoader
 				.getSystemResource(Application.ICONS_SKY_LIGHT_ICONS_PNG_16X16_ACTIVE_PDF_PNG);
 
@@ -125,8 +126,9 @@ public class AppPdfViewer {
 						AppNewBirdWindow.LABEL_FONT_SIZE));
 		internalFrame.getContentPane().setLayout(null);
 		internalFrame.setSize(desktopPane.getWidth(), desktopPane.getHeight());
-		internalFrame.setFrameIcon(new ImageIcon(iconPdf));
+		internalFrame.setButtonBild(new ImageIcon(iconPdf));
 		internalFrame.setResizable(false);
+		internalFrame.setTitle(file.getAbsolutePath());
 
 		JPanel panel_1 = new JPanel();
 		panel_1.setBounds(0, 0, internalFrame.getWidth(), 45);

@@ -20,7 +20,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
+//import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
@@ -30,6 +31,7 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 import org.apache.log4j.Logger;
+import org.peie.avicultura.helper.AviInternalFrame;
 import org.peie.avicultura.helper.AviProperties;
 import org.peie.avicultura.helper.AviculturaException;
 import org.peie.avicultura.helper.BirdObject;
@@ -74,7 +76,7 @@ public class AppNewBirdWindow {
 	private boolean copyBirdFlag;
 	private String modBirdId;
 	private JLabel lblSchnesittich;
-	private JInternalFrame internalFrame;
+	private AviInternalFrame internalFrame;
 	private JCheckBox chckbxOffen;
 	private JRadioButton male;
 	private JRadioButton female;
@@ -90,12 +92,14 @@ public class AppNewBirdWindow {
 	private BufferedImage iconSave;
 	private BufferedImage iconCopy;
 	private AviProperties properties;
+	private JPanel taskbar;
 
 	public AppNewBirdWindow(DbHelper dbhelper, JDesktopPane desktopPane,
-			AviProperties properties) {
+			AviProperties properties, JPanel taskbar) {
 		super();
 		this.dbhelper = dbhelper;
 		this.desktopPane = desktopPane;
+		this.taskbar = taskbar;
 		newBirdFlag = true;
 		copyBirdFlag = false;
 		modBirdId = null;
@@ -106,11 +110,12 @@ public class AppNewBirdWindow {
 	}
 
 	public AppNewBirdWindow(DbHelper dbhelper, JDesktopPane desktopPane,
-			BirdObject birdEditObj, AviProperties properties) {
+			BirdObject birdEditObj, AviProperties properties, JPanel taskbar) {
 		super();
 		this.dbhelper = dbhelper;
 		this.desktopPane = desktopPane;
 		this.birdEditObj = birdEditObj;
+		this.taskbar = taskbar;
 		newBirdFlag = false;
 		copyBirdFlag = false;
 		modBirdId = birdEditObj.getBirdDataId();
@@ -287,12 +292,15 @@ public class AppNewBirdWindow {
 
 		List<SpeciesObj> names = dbhelper.getBirdSpecies();
 
-		internalFrame = new JInternalFrame();
+		internalFrame = new AviInternalFrame(taskbar);
 		internalFrame.getContentPane().setBackground(
 				SystemColor.activeCaptionBorder);
 		internalFrame.getContentPane().setFont(
 				new Font(LABEL_FONT, LABEL_FONT_STYLE, LABEL_FONT_SIZE));
-		internalFrame.setFrameIcon(new ImageIcon(iconNewBird));
+		//internalFrame.setFrameIcon(new ImageIcon(iconNewBird));
+		
+		//internalFrame.setButtonBild(new ImageIcon(iconNewBird));
+		
 		internalFrame.setMaximizable(true);
 		internalFrame.setResizable(true);
 		internalFrame.setClosable(true);
@@ -302,45 +310,45 @@ public class AppNewBirdWindow {
 		final int counter = app.newNavLabel("Neuer Vogel", internalFrame, true,
 				iconNewBird);
 		internalFrame.setTitle("Neuer Vogel" + (counter + 1));
+		
+		internalFrame.setButtonBild(new ImageIcon(iconNewBird));
 
 		gobalFrameCounter = counter;
 
-		internalFrame.addInternalFrameListener(new InternalFrameListener() {
-			public void internalFrameClosed(InternalFrameEvent e) {
-				// navLables.get(counter).setVisible(false);
-				app.setNavLableHidden(counter);
-			}
-
-			public void internalFrameClosing(InternalFrameEvent e) {
-				// navLables.get(counter).setVisible(false);
-				app.setNavLableHidden(counter);
-			}
-
-			@Override
-			public void internalFrameActivated(InternalFrameEvent arg0) {
-
-			}
-
-			@Override
-			public void internalFrameDeactivated(InternalFrameEvent arg0) {
-
-			}
-
-			@Override
-			public void internalFrameDeiconified(InternalFrameEvent arg0) {
-
-			}
-
-			@Override
-			public void internalFrameIconified(InternalFrameEvent arg0) {
-
-			}
-
-			@Override
-			public void internalFrameOpened(InternalFrameEvent arg0) {
-
-			}
-		});
+		/*
+		 * internalFrame.addInternalFrameListener(new InternalFrameListener() {
+		 * public void internalFrameClosed(InternalFrameEvent e) { //
+		 * navLables.get(counter).setVisible(false);
+		 * app.setNavLableHidden(counter); }
+		 * 
+		 * public void internalFrameClosing(InternalFrameEvent e) { //
+		 * navLables.get(counter).setVisible(false);
+		 * app.setNavLableHidden(counter); }
+		 * 
+		 * @Override public void internalFrameActivated(InternalFrameEvent arg0)
+		 * {
+		 * 
+		 * }
+		 * 
+		 * @Override public void internalFrameDeactivated(InternalFrameEvent
+		 * arg0) {
+		 * 
+		 * }
+		 * 
+		 * @Override public void internalFrameDeiconified(InternalFrameEvent
+		 * arg0) {
+		 * 
+		 * }
+		 * 
+		 * @Override public void internalFrameIconified(InternalFrameEvent arg0)
+		 * {
+		 * 
+		 * }
+		 * 
+		 * @Override public void internalFrameOpened(InternalFrameEvent arg0) {
+		 * 
+		 * } });
+		 */
 
 		JLabel lblNewLabel_2 = new JLabel("Vogelart");
 		lblNewLabel_2.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE,
@@ -661,7 +669,7 @@ public class AppNewBirdWindow {
 				try {
 					birdEditObj = dbhelper.getBirdEdit(ringNo.getText());
 					AppNewBirdWindow copyBird = new AppNewBirdWindow(dbhelper,
-							desktopPane, birdEditObj, properties);
+							desktopPane, birdEditObj, properties, taskbar);
 
 					copyBird.openNewBird();
 					copyBird.fillCopySheet(iconCopy, "Neuer Vogel kopiert von "

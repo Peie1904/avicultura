@@ -32,7 +32,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
+//import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -55,6 +55,7 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.log4j.Logger;
 import org.peie.avicultura.helper.AboutWindow;
+import org.peie.avicultura.helper.AviInternalFrame;
 import org.peie.avicultura.helper.AviProperties;
 import org.peie.avicultura.helper.AviculturaException;
 import org.peie.avicultura.helper.BirdObject;
@@ -65,11 +66,13 @@ import org.peie.avicultura.helper.StammBlattObj;
 import org.peie.avicultura.main.Avicultura;
 import org.peie.avicultura.pdf.StammBlattWriter;
 import org.peie.avicultura.pdf.ZuchtBuchWriter;
+import java.awt.FlowLayout;
 
 public class Application {
 
 	private static final String JUNGTIERSTAMMBLATT = "Jungtierstammblatt";
 	public static final String ICONS_LOGO_SMALL_PNG = "icons/logo_small.png";
+	public static final String ICONS_LOGO_LITTLE_PNG = "icons/logo_little.png";
 	public static final String ICONS_SKY_LIGHT_ICONS_PNG_16X16_ACTIVE_NO_PNG = "icons/skyLight/icons/PNG/48x48/_active__no.png";
 	public static final String ICONS_SKY_LIGHT_ICONS_PNG_16X16_ACTIVE_COPY_PNG = "icons/skyLight/icons/PNG/16x16/_active__copy.png";
 	public static final String ICONS_SKY_LIGHT_ICONS_PNG_48X48_ACTIVE_DOCUMENT_PNG = "icons/skyLight/icons/PNG/48x48/_active__document.png";
@@ -129,8 +132,11 @@ public class Application {
 	public void startAviculturaBrowser(final DbHelper dbhelper) {
 		this.dbhelper = dbhelper;
 		desktopPane = new JDesktopPane();
+		desktopPane.setBackground(Color.LIGHT_GRAY);
+		taskbar = new JPanel();
 
-		newBirdWindow = new AppNewBirdWindow(dbhelper, desktopPane, properties);
+		newBirdWindow = new AppNewBirdWindow(dbhelper, desktopPane, properties,
+				taskbar);
 		LOG.info("Start App");
 		frame = new JFrame(Avicultura.APPLICATION + " " + Avicultura.VERSION);
 
@@ -260,6 +266,7 @@ public class Application {
 		desktopPane.setForeground(Color.GRAY);
 		desktopPane.setBackground(SystemColor.inactiveCaptionText);
 		BorderLayout layout = new BorderLayout();
+
 		BorderLayout layoutNav = new BorderLayout();
 
 		frame.getContentPane().setLayout(layout);
@@ -287,12 +294,21 @@ public class Application {
 
 		navigator.add(tabBrowser, BorderLayout.CENTER);
 
-		//frame.getContentPane().add(navigator, BorderLayout.WEST);
+		// frame.getContentPane().add(navigator, BorderLayout.WEST);
+
+		taskbar.setPreferredSize(new Dimension(frame.getWidth(), 28));
 		
-		taskbar = new JPanel();
+		FlowLayout taskbarLayout = new FlowLayout(FlowLayout.LEADING, 5, 5);
+		
+		taskbarLayout.setVgap(1);
+
+		taskbar.setLayout(taskbarLayout);
+		
+		taskbar.setBackground(Color.GRAY);
 
 		frame.getContentPane().add(desktopPane, BorderLayout.CENTER);
-		frame.getContentPane().add(taskbar, BorderLayout.SOUTH);
+		frame.add(taskbar, BorderLayout.SOUTH);
+		
 
 		/*
 		 * try { newBirdWindow.openNewBird(); } catch (AviculturaException e1) {
@@ -325,7 +341,8 @@ public class Application {
 
 				System.out.println("ZUCHTPAARE");
 
-				ZuchtPaareFrame zpf = new ZuchtPaareFrame(desktopPane, dbhelper,taskbar);
+				ZuchtPaareFrame zpf = new ZuchtPaareFrame(desktopPane,
+						dbhelper, taskbar);
 
 				try {
 					zpf.showInternalFrame();
@@ -377,7 +394,7 @@ public class Application {
 
 					AppPdfViewer pdfViewer;
 					try {
-						pdfViewer = new AppPdfViewer(desktopPane);
+						pdfViewer = new AppPdfViewer(desktopPane,taskbar);
 						pdfViewer.showPdf(datname);
 					} catch (AviculturaException e1) {
 						e1.viewError(frame);
@@ -417,7 +434,7 @@ public class Application {
 						list = dbhelper.getBirdList();
 						writer.createZuchtBuch(list, datname);
 
-						AppPdfViewer pdfViewer = new AppPdfViewer(desktopPane);
+						AppPdfViewer pdfViewer = new AppPdfViewer(desktopPane,taskbar);
 
 						pdfViewer.showPdf(datname);
 					} catch (AviculturaException e1) {
@@ -492,7 +509,7 @@ public class Application {
 
 	}
 
-	public int newNavLabel(String text, final JInternalFrame frame,
+	public int newNavLabel(String text, final AviInternalFrame frame,
 			boolean showNumber, BufferedImage iconIntern) {
 		int counter = navLables.size();
 		String labelText = text + (counter + 1);
@@ -592,9 +609,9 @@ public class Application {
 			i++;
 		}
 
-		final JInternalFrame internalFrame = new JInternalFrame(
+		final AviInternalFrame internalFrame = new AviInternalFrame(taskbar,
 				"Suchergebnis für: " + searchString + " " + searchType);
-		internalFrame.setFrameIcon(new ImageIcon(iconFindBird));
+		internalFrame.setButtonBild(new ImageIcon(iconFindBird));
 		internalFrame.setClosable(true);
 		internalFrame.setMaximumSize(screenDesktop);
 		internalFrame.setSize(width, heigth);
@@ -747,7 +764,7 @@ public class Application {
 		if (check == 0) {
 			BirdObject birdEditObj = dbhelper.getBirdEdit(ringNo);
 			AppNewBirdWindow editWindow = new AppNewBirdWindow(dbhelper,
-					desktopPane, birdEditObj, properties);
+					desktopPane, birdEditObj, properties, taskbar);
 			try {
 				editWindow.openNewBird();
 				editWindow.fillDataSheet(iconEdit, "Bearbeite Vogel " + ringNo);
@@ -766,7 +783,7 @@ public class Application {
 		if (check == 0) {
 			BirdObject birdEditObj = dbhelper.getBirdEdit(ringNo);
 			AppNewBirdWindow copyWindow = new AppNewBirdWindow(dbhelper,
-					desktopPane, birdEditObj, properties);
+					desktopPane, birdEditObj, properties, taskbar);
 			try {
 				copyWindow.openNewBird();
 				copyWindow.fillCopySheet(iconCopy, "Neuer Vogel kopiert von "
@@ -824,7 +841,7 @@ public class Application {
 
 				AppPdfViewer pdfviewer;
 
-				pdfviewer = new AppPdfViewer(desktopPane);
+				pdfviewer = new AppPdfViewer(desktopPane,taskbar);
 
 				pdfviewer.showPdf(pdfFile);
 			}

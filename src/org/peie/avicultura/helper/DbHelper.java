@@ -115,9 +115,9 @@ public class DbHelper {
 			hideBirdByRingNoStmt = con.prepareStatement(hideBirdByRingNoSql);
 			selectStammBlattStmt = con.prepareStatement(selectStammBlattSql);
 			selectZuchtPaareStmt = con.prepareStatement(selectZuchtPaareSql);
-			
+
 			createZuchtPaarTable();
-			
+
 			selectBirdPairStmt = con.prepareStatement(selectBirdPairSql);
 			insertBirdPairStmt = con.prepareStatement(insertBirdPairSql);
 		} catch (SQLException e) {
@@ -157,12 +157,15 @@ public class DbHelper {
 
 		return check;
 	}
-	
-	private int getPairNo(ZuchtPaareObj zuchtPaareObj) throws AviculturaException{
-		return getPairNo(zuchtPaareObj.getPaparing(), zuchtPaareObj.getMamaring());
+
+	private int getPairNo(ZuchtPaareObj zuchtPaareObj)
+			throws AviculturaException {
+		return getPairNo(zuchtPaareObj.getPaparing(),
+				zuchtPaareObj.getMamaring());
 	}
 
-	private int getPairNo(String paparing,String mamaring) throws AviculturaException {
+	private int getPairNo(String paparing, String mamaring)
+			throws AviculturaException {
 		int pairNo = 0;
 		try {
 			selectBirdPairStmt.setString(1, paparing);
@@ -184,8 +187,7 @@ public class DbHelper {
 					"pair there error", e);
 		}
 
-		log.info(paparing + " + "
-				+ mamaring + " = " + pairNo);
+		log.info(paparing + " + " + mamaring + " = " + pairNo);
 
 		return pairNo;
 	}
@@ -215,18 +217,16 @@ public class DbHelper {
 			}
 		}
 
-		
-
 	}
-	
-	public void fillPairTables() throws AviculturaException{
+
+	public void fillPairTables() throws AviculturaException {
 		List<ZuchtPaareObj> birdPairs = getZuchtPaareData();
 
 		try {
 			for (ZuchtPaareObj zuchtPaareObj : birdPairs) {
 				boolean pairThere = false;
 
-				if (getPairNo(zuchtPaareObj) != 0){
+				if (getPairNo(zuchtPaareObj) != 0) {
 					pairThere = true;
 					log.info("pair there");
 				}
@@ -268,8 +268,8 @@ public class DbHelper {
 				String mamaring = res.getString("mamaring");
 				String mamavogel = res.getString("mamavogel");
 				String mamafarbe = res.getString("mamafarbe");
-				
-				int birdpairno = getPairNo(paparing,mamaring);
+
+				int birdpairno = getPairNo(paparing, mamaring);
 
 				zpo.setPaparing(paparing);
 				zpo.setPapavogel(papavogel);

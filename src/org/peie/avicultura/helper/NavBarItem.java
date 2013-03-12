@@ -1,13 +1,13 @@
 package org.peie.avicultura.helper;
 
-import javax.swing.JInternalFrame;
+
 import javax.swing.JLabel;
 
 public class NavBarItem {
 	private JLabel navlabel;
-	private JInternalFrame iFrame;
+	private AviInternalFrame iFrame;
 
-	public NavBarItem(JLabel navlabel, JInternalFrame iFrame) {
+	public NavBarItem(JLabel navlabel, AviInternalFrame iFrame) {
 		super();
 		this.navlabel = navlabel;
 		this.iFrame = iFrame;
@@ -17,7 +17,7 @@ public class NavBarItem {
 		return navlabel;
 	}
 
-	public JInternalFrame getiFrame() {
+	public AviInternalFrame getiFrame() {
 		return iFrame;
 	}
 
