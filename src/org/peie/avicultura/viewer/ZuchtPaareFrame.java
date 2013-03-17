@@ -2,6 +2,10 @@ package org.peie.avicultura.viewer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.JDesktopPane;
@@ -53,9 +57,9 @@ public class ZuchtPaareFrame {
 
 		desktopPane.add(internalFrame);
 
-		dbhelper.fillPairTables();
+		//dbhelper.fillPairTables();
 
-		List<ZuchtPaareObj> zpoList = dbhelper.getZuchtPaareData();
+		List<ZuchtPaareObj> zpoList = dbhelper.getZuchtPaareDataForTable();
 
 		final Object[][] inTable = new Object[zpoList.size()][8];
 
@@ -76,6 +80,59 @@ public class ZuchtPaareFrame {
 		}
 
 		table = new JTable();
+		
+		table.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int x = e.getX();
+				int y = e.getY();
+
+				Point mousePos = MouseInfo.getPointerInfo().getLocation();
+
+				int xMouse = mousePos.x + 40;
+				int yMouse = mousePos.y + 10;
+
+				if (e.getClickCount() == 2
+						&& e.getButton() == MouseEvent.BUTTON1) {
+					int row = table.getSelectedRow();
+					String zuchtPaarId = table.getValueAt(row, 0).toString();
+
+					zuchtPaarAnzeige(zuchtPaarId);
+
+				}
+
+				if (e.getButton() == MouseEvent.BUTTON3) {
+
+					table.clearSelection();
+					int fire = table.rowAtPoint(new Point(x, y));
+					table.addRowSelectionInterval(fire, fire);
+					String zuchtPaarId = table.getValueAt(fire, 0).toString();
+
+					
+				}
+			}
+		});
 
 		table.setModel(new DefaultTableModel(inTable, new String[] {
 				"Zuchtpaar", "Vater Ringnr.", "Vater Art", "Vater Farbe",
@@ -106,6 +163,34 @@ public class ZuchtPaareFrame {
 
 		internalFrame.setVisible(true);
 
+	}
+	
+	
+	private void zuchtPaarAnzeige(String zuchtPaarId){
+		
+		Dimension screenDesktop = desktopPane.getSize();
+
+		int heigth = screenDesktop.height - 200;
+		int width = screenDesktop.width - 200;
+
+		Dimension minSize = new Dimension(700, 500);
+
+		final AviInternalFrame internalFrame = new AviInternalFrame(taskBar,
+				"Zuchtpaar: "+zuchtPaarId);
+		// internalFrame.setFrameIcon(new ImageIcon(iconFindBird));
+		internalFrame.setClosable(true);
+		internalFrame.setMaximumSize(screenDesktop);
+		internalFrame.setSize(width, heigth);
+		internalFrame.setMinimumSize(minSize);
+		// internalFrame.setBounds(10, 11, 596, 416);
+		internalFrame.setResizable(true);
+		internalFrame.setMaximizable(true);
+
+		desktopPane.add(internalFrame);
+		
+		
+		internalFrame.setVisible(true);
+		
 	}
 
 }

@@ -8,6 +8,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.net.URL;
 
@@ -75,6 +76,7 @@ public class AviInternalFrame extends JInternalFrame {
 
 	private void newTask() {
 
+		super.setTitle(name);
 		button.setText(name);
 		button.setToolTipText(name);
 		button.setPreferredSize(new Dimension(110, 25));
@@ -101,9 +103,19 @@ public class AviInternalFrame extends JInternalFrame {
 				LOG.info(isShowing());
 
 				if (isVisible()) {
+					
+					if(isSelected){
 					setVisible(false);
 					button.setBackground(Color.lightGray);
 					button.setForeground(Color.darkGray);
+					}else{
+						try {
+							setSelected(true);
+						} catch (PropertyVetoException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
 
 				} else {
 					setVisible(true);

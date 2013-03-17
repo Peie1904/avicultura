@@ -7,13 +7,22 @@ public class ZuchtPaareObj {
 	private String mamaring;
 	private String mamavogel;
 	private String mamafarbe;
-	private int birdpairno = 0;
+	private String birdpairno = "0";
+	private String BIRDDATAID;
 
-	public int getBirdpairno() {
+	public String getBIRDDATAID() {
+		return BIRDDATAID;
+	}
+
+	public void setBIRDDATAID(String bIRDDATAID) {
+		BIRDDATAID = bIRDDATAID;
+	}
+
+	public String getBirdpairno() {
 		return birdpairno;
 	}
 
-	public void setBirdpairno(int birdpairno) {
+	public void setBirdpairno(String birdpairno) {
 		this.birdpairno = birdpairno;
 	}
 
