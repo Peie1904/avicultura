@@ -215,8 +215,14 @@ public class Application {
 		JMenuItem mntmNeuerVogel = new JMenuItem("Neuer Vogel");
 		mntmNeuerVogel.setIcon(new ImageIcon(iconNewBird));
 		mnDatei.add(mntmNeuerVogel);
+		
+		mnDatei.addSeparator();
+		
+		JMenuItem mntmNeuesZuchtpaar = new JMenuItem("Neues Zuchtpaar");
+		mntmNeuesZuchtpaar.setIcon(new ImageIcon(iconNewBird));
+		mnDatei.add(mntmNeuesZuchtpaar);
 
-		JMenuItem mntmZuchtpaare = new JMenuItem("Zuchtpaare");
+		JMenuItem mntmZuchtpaare = new JMenuItem("Zuchtpaare anzeigen");
 		mntmZuchtpaare.setIcon(new ImageIcon(iconFindBird));
 		mnDatei.add(mntmZuchtpaare);
 
@@ -331,6 +337,20 @@ public class Application {
 				}
 
 				System.exit(0);
+			}
+		});
+		
+		
+		mntmNeuesZuchtpaar.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				NeuesZuchtpaarFrame nzpf = new NeuesZuchtpaarFrame(desktopPane, dbhelper, taskbar);
+				
+				nzpf.showFrame();
+				
+
 			}
 		});
 

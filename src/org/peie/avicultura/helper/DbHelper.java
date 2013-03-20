@@ -133,7 +133,7 @@ public class DbHelper {
 			searchRingStmt = con.prepareStatement(searchRingSql);
 			searchBirdspeciesNameStmt = con
 					.prepareStatement(searchBirdspeciesNameSql);
-			importStmt = con.prepareStatement(importSql);
+			
 			importSpeciesStmt = con.prepareStatement(importSpeciesSql);
 			searchGenderStmt = con.prepareStatement(searchGenderSql);
 			checkRingNoStmt = con.prepareStatement(checkRingNoSql);
@@ -155,6 +155,8 @@ public class DbHelper {
 
 				fillPairTables();
 			}
+			
+			importStmt = con.prepareStatement(importSql);
 
 		} catch (SQLException e) {
 			throw new AviculturaException(
