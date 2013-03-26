@@ -26,6 +26,8 @@ import org.peie.avicultura.main.Avicultura;
 import org.peie.avicultura.viewer.AppNewBirdWindow;
 
 public class DbHelper {
+	private static final String MUTTER2 = "mutter";
+	private static final String VATER2 = "vater";
 	private static final String _0 = "0";
 	public static final String NEUER_VOGEL = "Neue Vogelart";
 	private Connection con;
@@ -113,6 +115,9 @@ public class DbHelper {
 
 	private PreparedStatement selectPaarDataStmt;
 
+	private static final String checkBirdPairSql = "select  BIRDTYPEID, GENDER from BIRDDATA where RINGNO = ? and MODFLAG = 0";
+	private PreparedStatement checkBirdPairStmt;
+
 	private String YEAR_NOW;
 
 	public DbHelper(boolean newDb) throws AviculturaException {
@@ -133,7 +138,7 @@ public class DbHelper {
 			searchRingStmt = con.prepareStatement(searchRingSql);
 			searchBirdspeciesNameStmt = con
 					.prepareStatement(searchBirdspeciesNameSql);
-			
+
 			importSpeciesStmt = con.prepareStatement(importSpeciesSql);
 			searchGenderStmt = con.prepareStatement(searchGenderSql);
 			checkRingNoStmt = con.prepareStatement(checkRingNoSql);
@@ -150,12 +155,13 @@ public class DbHelper {
 			selectBirdPairStmt = con.prepareStatement(selectBirdPairSql);
 			insertBirdPairStmt = con.prepareStatement(insertBirdPairSql);
 			selectPaarDataStmt = con.prepareStatement(selectPaarDataSql);
+			checkBirdPairStmt = con.prepareStatement(checkBirdPairSql);
 
 			if (!createBirdPairColumn()) {
 
 				fillPairTables();
 			}
-			
+
 			importStmt = con.prepareStatement(importSql);
 
 		} catch (SQLException e) {
@@ -364,9 +370,9 @@ public class DbHelper {
 				String mamaring = res.getString("mamaring");
 				String mamavogel = res.getString("mamavogel");
 				String mamafarbe = res.getString("mamafarbe");
-				String birdpairno = res.getString("BIRDPAIRID")+"-"+res.getString("birdPairYear");
+				String birdpairno = res.getString("BIRDPAIRID") + "-"
+						+ res.getString("birdPairYear");
 
-				 
 				long modm = res.getLong("mamamod");
 				long modp = res.getLong("papamod");
 
@@ -378,7 +384,7 @@ public class DbHelper {
 					zpo.setMamavogel(mamavogel);
 					zpo.setMamafarbe(mamafarbe);
 					zpo.setBirdpairno(birdpairno);
-					//zpo.setBIRDDATAID(BIRDDATAID);
+					// zpo.setBIRDDATAID(BIRDDATAID);
 
 					zpoList.add(zpo);
 				}
@@ -658,6 +664,7 @@ public class DbHelper {
 			insertBirdPairStmt.close();
 			selectPaarDataStmt.close();
 			selectModflagForBirdStmt.close();
+			checkBirdPairStmt.close();
 			con.close();
 
 			log.info("close database");
@@ -1293,6 +1300,117 @@ public class DbHelper {
 		sqlCmds = null;
 		log.info(">>>> Loading " + fileName + " took " + (sumTime / 1000.0)
 				+ " sec.\n\n");
+	}
+
+	public final static int CHECK_VATER_NOT = -1;
+	public final static int CHECK_MUTTER_NOT = -2;
+	public final static int CHECK_TYPE_NOT_EQUAL = -3;
+	public final static int CHECK_GENDER_NOT = -4;
+	public final static int CHECK_GENDER_NOT_10 = -5;
+	public final static int CHECK_GENDER_NOT_01 = -6;
+	public final static int CHECK_PAIR_EXSISTS = -7;
+
+	public int checkBirdPair(String vater, String mutter)
+			throws AviculturaException {
+		String vaterBirdId = VATER2;
+		double vaterGender = 0.0;
+		String mutterBirdId = MUTTER2;
+		double mutterGender = 0.0;
+
+		log.info(vater + " " + mutter);
+
+		try {
+			checkBirdPairStmt.setString(1, vater);
+			ResultSet res = checkBirdPairStmt.executeQuery();
+
+			while (res.next()) {
+				vaterBirdId = res.getString("BIRDTYPEID");
+				vaterGender = res.getDouble("GENDER");
+			}
+
+			res.close();
+
+			checkBirdPairStmt.setString(1, mutter);
+			res = checkBirdPairStmt.executeQuery();
+
+			while (res.next()) {
+				mutterBirdId = res.getString("BIRDTYPEID");
+				mutterGender = res.getDouble("GENDER");
+			}
+
+			res.close();
+
+		} catch (SQLException e) {
+			throw new AviculturaException(
+					AviculturaException.SQL_EXECUTION_FAILED, e.getMessage(), e);
+		}
+
+		log.info(vaterBirdId + " " + mutterBirdId);
+
+		if (vaterBirdId.equals(VATER2)) {
+			return CHECK_VATER_NOT;
+		}
+
+		if (mutterBirdId.equals(MUTTER2)) {
+			return CHECK_MUTTER_NOT;
+		}
+
+		if (!vaterBirdId.equals(mutterBirdId)) {
+			return CHECK_TYPE_NOT_EQUAL;
+		}
+
+		double summary = vaterGender + mutterGender;
+
+		log.info(vaterGender + " + " + mutterGender + " = " + summary);
+
+		if (summary != 1.1) {
+			return CHECK_GENDER_NOT;
+		}
+
+		if (vaterGender != 1.0) {
+			return CHECK_GENDER_NOT_10;
+		}
+
+		if (mutterGender != 0.1) {
+			return CHECK_GENDER_NOT_01;
+		}
+		
+		boolean exsists = false;
+
+		try {
+			selectBirdPairStmt.setString(1, vater);
+			selectBirdPairStmt.setString(2, mutter);
+
+			ResultSet res = selectBirdPairStmt.executeQuery();
+
+			while (res.next()) {
+				exsists = true;
+			}
+
+			res.close();
+
+		} catch (SQLException e1) {
+			throw new AviculturaException(
+					AviculturaException.SQL_EXECUTION_FAILED, e1.getMessage(), e1);
+		}
+		
+		if (exsists){
+			return CHECK_PAIR_EXSISTS;
+		}
+
+		try {
+			insertBirdPairStmt.setString(1, vater);
+			insertBirdPairStmt.setString(2, mutter);
+			insertBirdPairStmt.setString(3, YEAR_NOW);
+			insertBirdPairStmt.execute();
+		} catch (SQLException e) {
+			throw new AviculturaException(
+					AviculturaException.SQL_EXECUTION_FAILED,
+					"kann Paar nicht eintragen", e);
+		}
+
+		return 0;
+
 	}
 
 }
