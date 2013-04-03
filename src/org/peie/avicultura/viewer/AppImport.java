@@ -62,6 +62,7 @@ public class AppImport {
 
 				try {
 					dbhelper.importVisualBasicVersion(APPDATA);
+					dbhelper.fillPairTables();
 					error = false;
 				} catch (AviculturaException e) {
 					error = true;

@@ -8,7 +8,7 @@ import org.peie.avicultura.helper.AviculturaException;
 import org.peie.avicultura.helper.Helper;
 
 public class Avicultura extends AviculturaUtility {
-	public final static String VERSION = "0.0.3a beta";
+	public final static String VERSION = "0.0.3b beta";
 	public final static String APPLICATION = "avicultura";
 	public static String APPDATA = System.getenv("APPDATA");
 	public static String DATABASE = APPDATA + File.separator + APPLICATION;

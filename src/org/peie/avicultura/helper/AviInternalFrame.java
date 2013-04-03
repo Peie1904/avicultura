@@ -159,6 +159,18 @@ public class AviInternalFrame extends JInternalFrame {
 		super.setTitle(arg0);
 	}
 	
+	@Override
+	public void setVisible(boolean aFlag) {
+		
+		if (button != null){
+			button.setVisible(aFlag);
+		}
+		
+		
+		
+		super.setVisible(aFlag);
+	}
+	
 	
 
 }

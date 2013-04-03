@@ -155,7 +155,8 @@ public class AppNewBirdWindow {
 	public void fillCopySheet(BufferedImage icon, String title) {
 		if (!newBirdFlag) {
 			copyBirdFlag = true;
-			internalFrame.setFrameIcon(new ImageIcon(icon));
+			// internalFrame.setFrameIcon(new ImageIcon(icon));
+			internalFrame.setButtonBild(new ImageIcon(icon));
 			internalFrame.setTitle(title);
 			// ringNo.setText(birdEditObj.getRingNo());
 			// ringNo.setEditable(false);
@@ -178,7 +179,7 @@ public class AppNewBirdWindow {
 			color.setText(birdEditObj.getColor());
 			// color.setEditable(false);
 
-			fillGenderComboBox(birdEditObj.getSpeciesID());
+			// fillGenderComboBox(birdEditObj.getSpeciesID());
 
 			comboBoxMale.setSelectedItem(birdEditObj.getComboBoxMale());
 
@@ -210,6 +211,13 @@ public class AppNewBirdWindow {
 
 			medicCheck.setText(birdEditObj.getMedicCheck());
 			medicComment.setText(birdEditObj.getMedicComment());
+			try {
+				birdPairField.setText(dbhelper.getBirdPairNo(birdEditObj
+						.getBirdPairId()));
+			} catch (AviculturaException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			app.setLabelTitel(gobalFrameCounter,
 					"Ring Nr.: " + birdEditObj.getRingNo(), iconEdit);
@@ -220,7 +228,8 @@ public class AppNewBirdWindow {
 	public void fillDataSheet(BufferedImage icon, String title) {
 		if (!newBirdFlag) {
 			btnCopy.setVisible(true);
-			internalFrame.setFrameIcon(new ImageIcon(icon));
+			// internalFrame.setFrameIcon(new ImageIcon(icon));
+			internalFrame.setButtonBild(new ImageIcon(icon));
 			internalFrame.setTitle(title);
 			ringNo.setText(birdEditObj.getRingNo());
 			ringNo.setEditable(false);
@@ -249,11 +258,11 @@ public class AppNewBirdWindow {
 			color.setText(birdEditObj.getColor());
 			color.setEditable(true);
 
-			fillGenderComboBox(birdEditObj.getSpeciesID());
+			// fillGenderComboBox(birdEditObj.getSpeciesID());
 
-			comboBoxMale.setSelectedItem(birdEditObj.getComboBoxMale());
+			// comboBoxMale.setSelectedItem(birdEditObj.getComboBoxMale());
 
-			comboBoxFemale.setSelectedItem(birdEditObj.getComboBoxFemale());
+			// comboBoxFemale.setSelectedItem(birdEditObj.getComboBoxFemale());
 
 			breedStart.setText(birdEditObj.getBreedStart());
 			ringAt.setText(birdEditObj.getRingAt());
@@ -275,6 +284,13 @@ public class AppNewBirdWindow {
 
 			medicCheck.setText(birdEditObj.getMedicCheck());
 			medicComment.setText(birdEditObj.getMedicComment());
+			try {
+				birdPairField.setText(dbhelper.getBirdPairNo(birdEditObj
+						.getBirdPairId()));
+			} catch (AviculturaException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			app.setLabelTitel(gobalFrameCounter,
 					"Ring Nr.: " + birdEditObj.getRingNo(), iconEdit);
@@ -284,6 +300,7 @@ public class AppNewBirdWindow {
 
 	private int gobalFrameCounter = 0;
 	private JButton btnCopy;
+	private JTextField birdPairField;
 
 	/**
 	 * @wbp.parser.entryPoint
@@ -297,10 +314,10 @@ public class AppNewBirdWindow {
 				SystemColor.activeCaptionBorder);
 		internalFrame.getContentPane().setFont(
 				new Font(LABEL_FONT, LABEL_FONT_STYLE, LABEL_FONT_SIZE));
-		//internalFrame.setFrameIcon(new ImageIcon(iconNewBird));
-		
-		//internalFrame.setButtonBild(new ImageIcon(iconNewBird));
-		
+		// internalFrame.setFrameIcon(new ImageIcon(iconNewBird));
+
+		// internalFrame.setButtonBild(new ImageIcon(iconNewBird));
+
 		internalFrame.setMaximizable(true);
 		internalFrame.setResizable(true);
 		internalFrame.setClosable(true);
@@ -310,7 +327,7 @@ public class AppNewBirdWindow {
 		final int counter = app.newNavLabel("Neuer Vogel", internalFrame, true,
 				iconNewBird);
 		internalFrame.setTitle("Neuer Vogel" + (counter + 1));
-		
+
 		internalFrame.setButtonBild(new ImageIcon(iconNewBird));
 
 		gobalFrameCounter = counter;
@@ -626,34 +643,72 @@ public class AppNewBirdWindow {
 		lblSichtvermerkBehrde.setBounds(485, 427, 184, 14);
 		internalFrame.getContentPane().add(lblSichtvermerkBehrde);
 
-		comboBoxMale = new JComboBox<String>();
-		comboBoxMale.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE,
-				LABEL_FONT_SIZE));
-		comboBoxMale.setBounds(513, 26, 156, 20);
+		// comboBoxMale = new JComboBox<String>();
+		// comboBoxMale.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE,
+		// LABEL_FONT_SIZE));
+		// comboBoxMale.setBounds(513, 26, 156, 20);
 
-		internalFrame.getContentPane().add(comboBoxMale);
+		// internalFrame.getContentPane().add(comboBoxMale);
 
-		JLabel lblVater = new JLabel("Vater");
+		birdPairField = new JTextField(10);
+		birdPairField.setBounds(513, 26, 156, 20);
+		birdPairField.setEditable(false);
+		internalFrame.getContentPane().add(birdPairField);
+
+		JLabel lblVater = new JLabel("Zuchtpaar");
 		lblVater.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE, LABEL_FONT_SIZE));
-		lblVater.setBounds(457, 29, 46, 14);
+		lblVater.setBounds(457, 29, 100, 14);
 		internalFrame.getContentPane().add(lblVater);
 
-		comboBoxFemale = new JComboBox<String>();
-		comboBoxFemale.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE,
-				LABEL_FONT_SIZE));
-		comboBoxFemale.setBounds(513, 54, 156, 20);
+		JButton newBirdPair = new JButton("Zuchtpaar", new ImageIcon(
+				iconNewBird));
+		newBirdPair.setBounds(513, 54, 156, 20);
 
-		internalFrame.getContentPane().add(comboBoxFemale);
+		internalFrame.getContentPane().add(newBirdPair);
 
-		String text = speciesBox.getSelectedItem().toString();
+		newBirdPair.addActionListener(new ActionListener() {
 
-		fillGenderComboBox(text);
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				ZuchtPaarAuswahl zpa = new ZuchtPaarAuswahl(desktopPane,
+						taskbar, dbhelper, birdPairField);
+				
+				String text = speciesBox.getSelectedItem().toString();
 
-		JLabel lblMutter = new JLabel("Mutter");
-		lblMutter.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE,
-				LABEL_FONT_SIZE));
-		lblMutter.setBounds(457, 54, 46, 14);
-		internalFrame.getContentPane().add(lblMutter);
+				// fillGenderComboBox(text);
+				String type = "";
+
+				if (text.endsWith(DbHelper.NEUER_VOGEL)) {
+					type = newSpecies.getText();
+				}else{
+					type = text;
+				}
+				
+				try {
+					zpa.neueAuswahl(type);
+				} catch (AviculturaException e) {
+					e.viewError(frame);
+				}
+
+			}
+		});
+
+		// comboBoxFemale = new JComboBox<String>();
+		// comboBoxFemale.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE,
+		// LABEL_FONT_SIZE));
+		// comboBoxFemale.setBounds(513, 54, 156, 20);
+
+		// internalFrame.getContentPane().add(comboBoxFemale);
+
+		// String text = speciesBox.getSelectedItem().toString();
+
+		// fillGenderComboBox(text);
+
+		// JLabel lblMutter = new JLabel("Mutter");
+		// lblMutter.setFont(new Font(LABEL_FONT, LABEL_FONT_STYLE,
+		// LABEL_FONT_SIZE));
+		// lblMutter.setBounds(457, 54, 46, 14);
+		// internalFrame.getContentPane().add(lblMutter);
 
 		btnSpeichern = new JButton("Speichern");
 		btnSpeichern.setIcon(new ImageIcon(iconSave));
@@ -710,7 +765,7 @@ public class AppNewBirdWindow {
 
 				String text = speciesBox.getSelectedItem().toString();
 
-				fillGenderComboBox(text);
+				// fillGenderComboBox(text);
 
 				if (text.endsWith(DbHelper.NEUER_VOGEL)) {
 					newSpecies.setVisible(true);
@@ -852,8 +907,8 @@ public class AppNewBirdWindow {
 		bird.addTestField(color);
 		bird.setMale(male.isSelected());
 		bird.setFemale(female.isSelected());
-		bird.setComboBoxFemale(comboBoxFemale.getSelectedItem().toString());
-		bird.setComboBoxMale(comboBoxMale.getSelectedItem().toString());
+		//bird.setComboBoxFemale(comboBoxFemale.getSelectedItem().toString());
+		//bird.setComboBoxMale(comboBoxMale.getSelectedItem().toString());
 		bird.setBreedStart(breedStart.getText());
 		bird.addTestField(breedStart);
 		bird.setRingAt(ringAt.getText());
@@ -885,6 +940,7 @@ public class AppNewBirdWindow {
 		bird.setGov(gov.getText());
 		bird.addTextPane(gov);
 		bird.setRingType(chckbxOffen.isSelected());
+		bird.setBirdPairIdWithYear(birdPairField.getText());
 
 		bird.print();
 		return bird;
@@ -914,6 +970,7 @@ public class AppNewBirdWindow {
 		}
 	}
 
+	@Deprecated
 	private void fillGenderComboBox(String species) {
 		List<GenderObj> maleList;
 		List<GenderObj> femaleList;

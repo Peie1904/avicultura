@@ -2,8 +2,6 @@ package org.peie.avicultura.helper;
 
 import java.io.File;
 import java.rmi.server.UID;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
@@ -13,6 +11,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+
 
 public class Helper {
 
@@ -48,20 +48,34 @@ public class Helper {
 
 		return out;
 	}
-
+	
 	public static String getDateString(long timestamp) {
-		SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+		return getDateString(timestamp, "dd.MM.yyyy");
+	}
+
+	public static String getDateString(long timestamp,String format) {
+		
+		//"yyyy/MM/dd"
+		
 		String dateOut = "";
+		
+		
 
 		if (timestamp != 0) {
-			Date date = new Date(timestamp);
+			DateTime date = new DateTime(timestamp);
 
-			dateOut = df.format(date);
+			dateOut = date.toString(format);
 		} else {
 			dateOut = "";
 		}
 
 		return dateOut;
+	}
+	
+	public static DateTime getDateTime(long timestamp){
+		
+		return new DateTime(timestamp);
+		
 	}
 
 	public static boolean isEmpty(String str) {

@@ -9,10 +9,11 @@ public class SearchResults {
 	private long SELLAT;
 	private long DEATHAT;
 	private String BIRDID;
+	private int BIRDPAIRID;
 
 	public SearchResults(String rINGNO, String bIRDSPECIESNAME,
 			long bREEDSTART, long rINGAT, long bUYAT, long sELLAT,
-			long dEATHAT, String BIRDID) {
+			long dEATHAT, String BIRDID,int BIRDPAIRID ) {
 		super();
 		RINGNO = rINGNO;
 		BIRDSPECIESNAME = bIRDSPECIESNAME;
@@ -22,6 +23,11 @@ public class SearchResults {
 		SELLAT = sELLAT;
 		DEATHAT = dEATHAT;
 		this.BIRDID = BIRDID;
+		this.BIRDPAIRID = BIRDPAIRID;
+	}
+	
+	public int getBIRDPAIRID(){
+		return BIRDPAIRID;
 	}
 
 	public String getBIRDID() {

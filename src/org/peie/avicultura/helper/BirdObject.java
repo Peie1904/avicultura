@@ -35,6 +35,7 @@ public class BirdObject {
 	private String obtman;
 	private String gov;
 	private String birdDataId;
+	private int birdPairId;
 	private List<JTextPane> textPanes;
 	private List<JTextField> textFields;
 	private final static Logger LOG = Logger.getLogger(BirdObject.class);
@@ -51,7 +52,7 @@ public class BirdObject {
 			String buyAt, String buyFrom, String sellAt, String sellTo,
 			String deathAt, String deathWhy, String medicStart,
 			String medicComment, String medicEnd, String medicCheck,
-			String docu, String obtman, String gov) {
+			String docu, String obtman, String gov,int birdPairId) {
 		super();
 		textPanes = new LinkedList<JTextPane>();
 		textFields = new LinkedList<JTextField>();
@@ -78,6 +79,30 @@ public class BirdObject {
 		this.docu = docu;
 		this.obtman = obtman;
 		this.gov = gov;
+		this.birdPairId = birdPairId;
+	}
+	
+	public void setBirdPairId(int birdPairId) {
+		this.birdPairId = birdPairId;
+	}
+	
+	public void setBirdPairIdWithYear(String birdPairId) {
+		
+		String[] tmp = birdPairId.split("-");
+		
+		if (tmp.length == 2){
+			int i = Integer.parseInt(tmp[0]);
+			this.birdPairId = i;
+		}else{
+			this.birdPairId = 0;
+		}
+		
+		
+		 
+	}
+
+	public int getBirdPairId(){
+		return birdPairId;
 	}
 
 	public String getBirdDataId() {
@@ -342,6 +367,7 @@ public class BirdObject {
 		LOG.info("is new own bird: " + isNewOwnBird());
 		LOG.info("is new buied bird: " + isNewBuiedBird());
 		LOG.info("is new bird with new species: " + isNewBirdWithNewSpecies());
+		LOG.info("birdPairId: "+birdPairId);
 	}
 
 }

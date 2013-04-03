@@ -3,6 +3,7 @@ package org.peie.avicultura.viewer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.MouseInfo;
@@ -32,7 +33,6 @@ import javax.swing.JComboBox;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-//import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -66,10 +66,11 @@ import org.peie.avicultura.helper.StammBlattObj;
 import org.peie.avicultura.main.Avicultura;
 import org.peie.avicultura.pdf.StammBlattWriter;
 import org.peie.avicultura.pdf.ZuchtBuchWriter;
-import java.awt.FlowLayout;
+//import javax.swing.JInternalFrame;
 
 public class Application {
 
+	private static final String DATE_FORMAT = "yyyy/MM/dd";
 	private static final String JUNGTIERSTAMMBLATT = "Jungtierstammblatt";
 	public static final String ICONS_LOGO_SMALL_PNG = "icons/logo_small.png";
 	public static final String ICONS_LOGO_LITTLE_PNG = "icons/logo_little.png";
@@ -215,9 +216,9 @@ public class Application {
 		JMenuItem mntmNeuerVogel = new JMenuItem("Neuer Vogel");
 		mntmNeuerVogel.setIcon(new ImageIcon(iconNewBird));
 		mnDatei.add(mntmNeuerVogel);
-		
+
 		mnDatei.addSeparator();
-		
+
 		JMenuItem mntmNeuesZuchtpaar = new JMenuItem("Neues Zuchtpaar");
 		mntmNeuesZuchtpaar.setIcon(new ImageIcon(iconNewBird));
 		mnDatei.add(mntmNeuesZuchtpaar);
@@ -303,18 +304,17 @@ public class Application {
 		// frame.getContentPane().add(navigator, BorderLayout.WEST);
 
 		taskbar.setPreferredSize(new Dimension(frame.getWidth(), 28));
-		
+
 		FlowLayout taskbarLayout = new FlowLayout(FlowLayout.LEADING, 5, 5);
-		
+
 		taskbarLayout.setVgap(1);
 
 		taskbar.setLayout(taskbarLayout);
-		
+
 		taskbar.setBackground(Color.GRAY);
 
 		frame.getContentPane().add(desktopPane, BorderLayout.CENTER);
 		frame.add(taskbar, BorderLayout.SOUTH);
-		
 
 		/*
 		 * try { newBirdWindow.openNewBird(); } catch (AviculturaException e1) {
@@ -339,17 +339,16 @@ public class Application {
 				System.exit(0);
 			}
 		});
-		
-		
+
 		mntmNeuesZuchtpaar.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				NeuesZuchtpaarFrame nzpf = new NeuesZuchtpaarFrame(desktopPane, dbhelper, taskbar);
-				
+				NeuesZuchtpaarFrame nzpf = new NeuesZuchtpaarFrame(desktopPane,
+						dbhelper, taskbar);
+
 				nzpf.showFrame();
-				
 
 			}
 		});
@@ -414,7 +413,7 @@ public class Application {
 
 					AppPdfViewer pdfViewer;
 					try {
-						pdfViewer = new AppPdfViewer(desktopPane,taskbar);
+						pdfViewer = new AppPdfViewer(desktopPane, taskbar);
 						pdfViewer.showPdf(datname);
 					} catch (AviculturaException e1) {
 						e1.viewError(frame);
@@ -454,7 +453,8 @@ public class Application {
 						list = dbhelper.getBirdList();
 						writer.createZuchtBuch(list, datname);
 
-						AppPdfViewer pdfViewer = new AppPdfViewer(desktopPane,taskbar);
+						AppPdfViewer pdfViewer = new AppPdfViewer(desktopPane,
+								taskbar);
 
 						pdfViewer.showPdf(datname);
 					} catch (AviculturaException e1) {
@@ -608,6 +608,8 @@ public class Application {
 
 		Map<Long, SearchResults> search = dbhelper.searchFor(searchString,
 				searchType);
+		
+		
 
 		final Object[][] inTable = new Object[search.size()][8];
 
@@ -620,12 +622,12 @@ public class Application {
 
 			inTable[i][0] = bird.getRINGNO();
 			inTable[i][1] = Helper.formatString(bird.getBIRDSPECIESNAME());
-			inTable[i][2] = Helper.getDateString(bird.getBREEDSTART());
-			inTable[i][3] = Helper.getDateString(bird.getRINGAT());
-			inTable[i][4] = Helper.getDateString(bird.getBUYAT());
-			inTable[i][5] = Helper.getDateString(bird.getSELLAT());
-			inTable[i][6] = Helper.getDateString(bird.getDEATHAT());
-			inTable[i][7] = pairs.getKey();
+			inTable[i][2] = Helper.getDateString(bird.getBREEDSTART(),DATE_FORMAT);
+			inTable[i][3] = Helper.getDateString(bird.getRINGAT(),DATE_FORMAT);
+			inTable[i][4] = Helper.getDateString(bird.getBUYAT(),DATE_FORMAT);
+			inTable[i][5] = Helper.getDateString(bird.getSELLAT(),DATE_FORMAT);
+			inTable[i][6] = Helper.getDateString(bird.getDEATHAT(),DATE_FORMAT);
+			inTable[i][7] = dbhelper.getBirdPairNo(bird.getBIRDPAIRID());
 			i++;
 		}
 
@@ -684,14 +686,15 @@ public class Application {
 
 		table.setModel(new DefaultTableModel(inTable, new String[] {
 				"Ring Nr.", "Vogelart", "Brutbeginn", "Beringt am",
-				"Erworben am", "Verkauft am", "Gestorben am", "time stamp" }) {
+				"Erworben am", "Verkauft am", "Gestorben am", "Eltern Zuchtpaar" }) {
 			/**
 					 * 
 					 */
+
 			private static final long serialVersionUID = 1L;
 			Class[] columnTypes = new Class[] { String.class, String.class,
 					Object.class, Object.class, Object.class, Object.class,
-					Object.class, Long.class };
+					Object.class, String.class };
 
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
@@ -861,7 +864,7 @@ public class Application {
 
 				AppPdfViewer pdfviewer;
 
-				pdfviewer = new AppPdfViewer(desktopPane,taskbar);
+				pdfviewer = new AppPdfViewer(desktopPane, taskbar);
 
 				pdfviewer.showPdf(pdfFile);
 			}
