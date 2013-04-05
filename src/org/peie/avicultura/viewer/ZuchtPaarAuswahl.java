@@ -64,7 +64,7 @@ public class ZuchtPaarAuswahl {
 		if (list.size() == 0){
 			JOptionPane.showMessageDialog(desktopPane, "Keine Auswahl für "+birdType,
 					"Fehler im Program", JOptionPane.ERROR_MESSAGE);
-			internalFrame.setVisible(false);
+			internalFrame.setVisibleAuswahl(false);
 			field.setText("");
 		}else{
 			internalFrame.setVisible(true);
@@ -118,7 +118,7 @@ public class ZuchtPaarAuswahl {
 					String zuchtPaarId = table.getValueAt(row, 0).toString();
 					
 					field.setText(zuchtPaarId);
-					internalFrame.setVisible(false);
+					internalFrame.setVisibleAuswahl(false);
 
 				}
 
