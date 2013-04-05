@@ -133,7 +133,10 @@ public class DbHelper {
 			"and BIRDDATA.BIRDTYPEID = BIRDSPECIES.BIRDTYPEID " +
 			"and BIRDSPECIES.BIRDSPECIESNAME like ? order by "+ TABLE_BIRDPAIR +".BIRDPAIRID desc";
 	private PreparedStatement getBirdPairAllStmt;
-
+	
+	private static final String getChildsSql = "select RINGNO,RINGAT,COLOR,GENDER from BIRDDATA where BIRDPAIRID = ? and MODFLAG = 0";
+	private PreparedStatement getChildsStmt;
+	
 	private String YEAR_NOW;
 
 	public DbHelper(boolean newDb) throws AviculturaException {
@@ -182,6 +185,7 @@ public class DbHelper {
 
 			getBirdPairYearStmt = con.prepareStatement(getBirdPairYearSql);
 			getBirdPairAllStmt = con.prepareStatement(getBirdPairAllSql);
+			getChildsStmt = con.prepareStatement(getChildsSql);
 
 			importStmt = con.prepareStatement(importSql);
 
@@ -714,6 +718,7 @@ public class DbHelper {
 			updateBirdPairStmt.close();
 			getBirdPairYearStmt.close();
 			getBirdPairAllStmt.close();
+			getChildsStmt.close();
 			con.close();
 
 			log.info("close database");
@@ -726,6 +731,42 @@ public class DbHelper {
 					AviculturaException.DB_CONNECT_FAILED,
 					"can not close connect a empty db", e);
 		}
+	}
+	
+	public List<ChildObj> getChilds(String brutPaar) throws AviculturaException{
+		
+		List<ChildObj> coList = new ArrayList<ChildObj>();
+		
+		try {
+			getChildsStmt.setInt(1, Helper.parsePairId(brutPaar));
+			
+			ResultSet res = getChildsStmt.executeQuery();
+			
+			while (res.next()){
+				
+				ChildObj co = new ChildObj();
+				co.setRINGNO(res.getString("RINGNO"));
+				co.setRINGAT(res.getLong("RINGAT"));
+				co.setCOLOR(res.getString("COLOR"));
+				co.setGENDER(res.getDouble("GENDER"));
+				
+				coList.add(co);
+				
+				log.info(""+res.getString("RINGNO"));
+				
+				
+				
+			}
+			
+			res.close();
+		} catch (SQLException e) {
+			throw new AviculturaException(
+					AviculturaException.SQL_EXECUTION_FAILED,
+					"database error: " + e.getLocalizedMessage(), e);
+		}
+		
+		return coList;
+		
 	}
 	
 	public List<ZuchtPaarAuswahlObj> getBirdPairAll(String birdType) throws AviculturaException{

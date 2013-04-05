@@ -2,6 +2,7 @@ package org.peie.avicultura.viewer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -10,6 +11,8 @@ import java.util.List;
 
 import javax.swing.JDesktopPane;
 
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -17,7 +20,9 @@ import javax.swing.table.DefaultTableModel;
 
 import org.peie.avicultura.helper.AviInternalFrame;
 import org.peie.avicultura.helper.AviculturaException;
+import org.peie.avicultura.helper.ChildObj;
 import org.peie.avicultura.helper.DbHelper;
+import org.peie.avicultura.helper.Helper;
 import org.peie.avicultura.helper.ZuchtPaareObj;
 
 public class ZuchtPaareFrame {
@@ -26,6 +31,7 @@ public class ZuchtPaareFrame {
 	private DbHelper dbhelper;
 	private JTable table;
 	private JPanel taskBar;
+	private JTable tableCild;
 
 	public ZuchtPaareFrame(JDesktopPane desktopPane, DbHelper dbhelper,
 			JPanel taskBar) {
@@ -39,16 +45,16 @@ public class ZuchtPaareFrame {
 
 		Dimension screenDesktop = desktopPane.getSize();
 
-		int heigth = screenDesktop.height - 200;
-		int width = screenDesktop.width - 200;
+		int heigth = 500;// screenDesktop.height - 200;
+		int width = 700;// screenDesktop.width - 200;
 
-		Dimension minSize = new Dimension(700, 500);
+		Dimension minSize = new Dimension(width, heigth);
 
 		final AviInternalFrame internalFrame = new AviInternalFrame(taskBar,
 				"Zuchtpaare");
 		// internalFrame.setFrameIcon(new ImageIcon(iconFindBird));
 		internalFrame.setClosable(true);
-		internalFrame.setMaximumSize(screenDesktop);
+		internalFrame.setMaximumSize(minSize);
 		internalFrame.setSize(width, heigth);
 		internalFrame.setMinimumSize(minSize);
 		// internalFrame.setBounds(10, 11, 596, 416);
@@ -57,7 +63,7 @@ public class ZuchtPaareFrame {
 
 		desktopPane.add(internalFrame);
 
-		//dbhelper.fillPairTables();
+		// dbhelper.fillPairTables();
 
 		List<ZuchtPaareObj> zpoList = dbhelper.getZuchtPaareDataForTable();
 
@@ -80,7 +86,7 @@ public class ZuchtPaareFrame {
 		}
 
 		table = new JTable();
-		
+
 		table.addMouseListener(new MouseListener() {
 
 			@Override
@@ -117,8 +123,11 @@ public class ZuchtPaareFrame {
 						&& e.getButton() == MouseEvent.BUTTON1) {
 					int row = table.getSelectedRow();
 					String zuchtPaarId = table.getValueAt(row, 0).toString();
+					String vater = table.getValueAt(row, 1).toString();
+					String mutter = table.getValueAt(row, 4).toString();
+					String vogelType = table.getValueAt(row, 2).toString();
 
-					zuchtPaarAnzeige(zuchtPaarId);
+					zuchtPaarAnzeige(zuchtPaarId, vater, mutter, vogelType);
 
 				}
 
@@ -129,7 +138,6 @@ public class ZuchtPaareFrame {
 					table.addRowSelectionInterval(fire, fire);
 					String zuchtPaarId = table.getValueAt(fire, 0).toString();
 
-					
 				}
 			}
 		});
@@ -164,22 +172,20 @@ public class ZuchtPaareFrame {
 		internalFrame.setVisible(true);
 
 	}
-	
-	
-	private void zuchtPaarAnzeige(String zuchtPaarId){
-		
-		Dimension screenDesktop = desktopPane.getSize();
 
-		int heigth = screenDesktop.height - 200;
-		int width = screenDesktop.width - 200;
+	private void zuchtPaarAnzeige(String zuchtPaarId, String vater,
+			String mutter, String vogelType) {
 
-		Dimension minSize = new Dimension(700, 500);
+		int heigth = 500;// screenDesktop.height - 200;
+		int width = 540;// screenDesktop.width - 200;
+
+		Dimension minSize = new Dimension(width, heigth);
 
 		final AviInternalFrame internalFrame = new AviInternalFrame(taskBar,
-				"Zuchtpaar: "+zuchtPaarId);
+				"Zuchtpaar: " + zuchtPaarId);
 		// internalFrame.setFrameIcon(new ImageIcon(iconFindBird));
 		internalFrame.setClosable(true);
-		internalFrame.setMaximumSize(screenDesktop);
+		internalFrame.setMaximumSize(minSize);
 		internalFrame.setSize(width, heigth);
 		internalFrame.setMinimumSize(minSize);
 		// internalFrame.setBounds(10, 11, 596, 416);
@@ -187,10 +193,91 @@ public class ZuchtPaareFrame {
 		internalFrame.setMaximizable(true);
 
 		desktopPane.add(internalFrame);
-		
-		
+
 		internalFrame.setVisible(true);
-		
+
+		internalFrame.getContentPane().setLayout(null);
+
+		JLabel lblVater = new JLabel("Vater: ");
+		lblVater.setBounds(10, 36, 46, 14);
+		internalFrame.getContentPane().add(lblVater);
+
+		JLabel label = new JLabel(vater);
+		label.setBounds(55, 36, 86, 14);
+		internalFrame.getContentPane().add(label);
+
+		JLabel lblMutter = new JLabel("Mutter:");
+		lblMutter.setBounds(153, 36, 46, 14);
+		internalFrame.getContentPane().add(lblMutter);
+
+		JLabel label_1 = new JLabel(mutter);
+		label_1.setBounds(209, 36, 86, 14);
+		internalFrame.getContentPane().add(label_1);
+
+		JLabel lblNewLabel = new JLabel(vogelType);
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblNewLabel.setBounds(10, 11, 107, 14);
+		internalFrame.getContentPane().add(lblNewLabel);
+
+		try {
+			List<ChildObj> coList = dbhelper.getChilds(zuchtPaarId);
+
+			final Object[][] inTable = new Object[coList.size()][8];
+
+			int i = 0;
+
+			for (ChildObj childObj : coList) {
+
+				inTable[i][0] = i + 1;
+				inTable[i][1] = childObj.getRINGNO();
+				inTable[i][2] = Helper.getDateString(childObj.getRINGAT(),
+						"yyyy/MM/dd");
+				inTable[i][3] = childObj.getCOLOR();
+				inTable[i][4] = childObj.getGENDER();
+
+				i++;
+
+			}
+
+			tableCild = new JTable();
+
+			tableCild
+					.setModel(new DefaultTableModel(inTable, new String[] {
+							"Lfd.", "Ringnummer", "Beringt am", "Farbe",
+							"Geschlecht" }) {
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = 1L;
+						Class[] columnTypes = new Class[] { Integer.class,
+								String.class, String.class, Object.class,
+								Object.class };
+
+						public Class getColumnClass(int columnIndex) {
+							return columnTypes[columnIndex];
+						}
+
+						public boolean isCellEditable(int rowIndex,
+								int columnIndex) {
+							return false;
+						}
+					});
+
+			tableCild.setAutoCreateRowSorter(true);
+
+			JPanel panel = new JPanel();
+			panel.setBounds(10, 71, 500, 300);
+			internalFrame.getContentPane().add(panel);
+			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+			panel.add(tableCild.getTableHeader(), BorderLayout.NORTH);
+			JScrollPane pane = new JScrollPane(tableCild);
+			panel.add(pane, BorderLayout.CENTER);
+
+		} catch (AviculturaException e) {
+			e.viewError(internalFrame);
+		}
+
 	}
 
 }

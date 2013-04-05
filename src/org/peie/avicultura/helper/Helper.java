@@ -193,4 +193,19 @@ public class Helper {
 
 		return props;
 	}
+	
+	public static int parsePairId(String pairIdStr){
+		
+		String[] tmp = pairIdStr.split("-");
+		String out = "0";
+		
+		if (tmp.length == 2){
+			out = tmp[0];
+		}
+		
+		return Integer.parseInt(out);
+		
+	}
+	
+	
 }
