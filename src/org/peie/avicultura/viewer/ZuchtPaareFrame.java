@@ -3,19 +3,22 @@ package org.peie.avicultura.viewer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.MouseInfo;
-import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.util.List;
 
-import javax.swing.JDesktopPane;
-
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import org.peie.avicultura.helper.AviInternalFrame;
@@ -24,6 +27,7 @@ import org.peie.avicultura.helper.ChildObj;
 import org.peie.avicultura.helper.DbHelper;
 import org.peie.avicultura.helper.Helper;
 import org.peie.avicultura.helper.ZuchtPaareObj;
+import org.peie.avicultura.pdf.AufzuchtBlattWriter;
 
 public class ZuchtPaareFrame {
 
@@ -32,6 +36,8 @@ public class ZuchtPaareFrame {
 	private JTable table;
 	private JPanel taskBar;
 	private JTable tableCild;
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			"PDF Files", "pdf");
 
 	public ZuchtPaareFrame(JDesktopPane desktopPane, DbHelper dbhelper,
 			JPanel taskBar) {
@@ -42,8 +48,6 @@ public class ZuchtPaareFrame {
 	}
 
 	public void showInternalFrame() throws AviculturaException {
-
-		Dimension screenDesktop = desktopPane.getSize();
 
 		int heigth = 500;// screenDesktop.height - 200;
 		int width = 700;// screenDesktop.width - 200;
@@ -111,13 +115,6 @@ public class ZuchtPaareFrame {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int x = e.getX();
-				int y = e.getY();
-
-				Point mousePos = MouseInfo.getPointerInfo().getLocation();
-
-				int xMouse = mousePos.x + 40;
-				int yMouse = mousePos.y + 10;
 
 				if (e.getClickCount() == 2
 						&& e.getButton() == MouseEvent.BUTTON1) {
@@ -126,19 +123,14 @@ public class ZuchtPaareFrame {
 					String vater = table.getValueAt(row, 1).toString();
 					String mutter = table.getValueAt(row, 4).toString();
 					String vogelType = table.getValueAt(row, 2).toString();
+					String farbeVater = table.getValueAt(row, 3).toString();
+					String farbeMutter = table.getValueAt(row, 6).toString();
 
-					zuchtPaarAnzeige(zuchtPaarId, vater, mutter, vogelType);
-
-				}
-
-				if (e.getButton() == MouseEvent.BUTTON3) {
-
-					table.clearSelection();
-					int fire = table.rowAtPoint(new Point(x, y));
-					table.addRowSelectionInterval(fire, fire);
-					String zuchtPaarId = table.getValueAt(fire, 0).toString();
+					zuchtPaarAnzeige(zuchtPaarId, vater, mutter, vogelType,
+							farbeVater, farbeMutter);
 
 				}
+
 			}
 		});
 
@@ -173,8 +165,9 @@ public class ZuchtPaareFrame {
 
 	}
 
-	private void zuchtPaarAnzeige(String zuchtPaarId, String vater,
-			String mutter, String vogelType) {
+	private void zuchtPaarAnzeige(final String zuchtPaarId, final String vater,
+			final String mutter, final String vogelType,
+			final String farbeVater, final String farbeMutter) {
 
 		int heigth = 500;// screenDesktop.height - 200;
 		int width = 540;// screenDesktop.width - 200;
@@ -218,6 +211,16 @@ public class ZuchtPaareFrame {
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblNewLabel.setBounds(10, 11, 107, 14);
 		internalFrame.getContentPane().add(lblNewLabel);
+
+		JButton btnAuzuchtvordruck = new JButton("Aufzuchtvordruck");
+		btnAuzuchtvordruck.setBounds(10, 387, 189, 23);
+		internalFrame.getContentPane().add(btnAuzuchtvordruck);
+
+		JButton btnAuzuchtList = new JButton("Zuchtpaar drucken");
+		btnAuzuchtList.setBounds(210, 387, 189, 23);
+		internalFrame.getContentPane().add(btnAuzuchtList);
+		
+		
 
 		try {
 			List<ChildObj> coList = dbhelper.getChilds(zuchtPaarId);
@@ -277,6 +280,93 @@ public class ZuchtPaareFrame {
 		} catch (AviculturaException e) {
 			e.viewError(internalFrame);
 		}
+
+		btnAuzuchtvordruck.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				String path = ".";
+				String pdfName = "AufzuchtBlatt_" + zuchtPaarId + ".pdf";
+
+				JFileChooser fileChooser = new JFileChooser();
+
+				fileChooser.setCurrentDirectory(new File(path));
+
+				fileChooser.setApproveButtonText("Speichern");
+				fileChooser.setMultiSelectionEnabled(false);
+				fileChooser.setFileFilter(filter);
+				fileChooser.setSelectedFile(new File(path, pdfName));
+
+				int result = fileChooser.showOpenDialog(internalFrame);
+				if (result == JFileChooser.APPROVE_OPTION) {
+
+					File aufzuchtBlatt = fileChooser.getSelectedFile();
+
+					// File aufzuchtBlatt = new File("fire.pdf");
+
+					try {
+						AufzuchtBlattWriter abw = new AufzuchtBlattWriter(
+								vogelType, vater, mutter, farbeVater,
+								farbeMutter, zuchtPaarId, aufzuchtBlatt);
+						abw.writeAufzuchtVorlage();
+
+						AppPdfViewer viewer = new AppPdfViewer(desktopPane,
+								taskBar);
+
+						viewer.showPdf(aufzuchtBlatt);
+
+					} catch (AviculturaException e) {
+						e.viewError(internalFrame);
+					}
+
+				}
+
+			}
+		});
+
+		btnAuzuchtList.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String path = ".";
+				String pdfName = "Zuchtpaar_" + zuchtPaarId + ".pdf";
+
+				JFileChooser fileChooser = new JFileChooser();
+
+				fileChooser.setCurrentDirectory(new File(path));
+
+				fileChooser.setApproveButtonText("Speichern");
+				fileChooser.setMultiSelectionEnabled(false);
+				fileChooser.setFileFilter(filter);
+				fileChooser.setSelectedFile(new File(path, pdfName));
+
+				int result = fileChooser.showOpenDialog(internalFrame);
+				if (result == JFileChooser.APPROVE_OPTION) {
+
+					File aufzuchtBlatt = fileChooser.getSelectedFile();
+
+					// File aufzuchtBlatt = new File("fire.pdf");
+
+					try {
+						AufzuchtBlattWriter abw = new AufzuchtBlattWriter(
+								vogelType, vater, mutter, farbeVater,
+								farbeMutter, zuchtPaarId, aufzuchtBlatt);
+						
+						abw.writeAufzuchtPaarListe(dbhelper);
+
+						AppPdfViewer viewer = new AppPdfViewer(desktopPane,
+								taskBar);
+
+						viewer.showPdf(aufzuchtBlatt);
+
+					} catch (AviculturaException e) {
+						e.viewError(internalFrame);
+					}
+				}
+
+			}
+		});
 
 	}
 

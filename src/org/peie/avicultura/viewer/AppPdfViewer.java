@@ -11,6 +11,8 @@ import java.awt.print.Paper;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URL;
@@ -30,6 +32,7 @@ import javax.swing.event.InternalFrameListener;
 import org.apache.log4j.Logger;
 import org.peie.avicultura.helper.AviInternalFrame;
 import org.peie.avicultura.helper.AviculturaException;
+import org.peie.avicultura.pdf.PrintPdf;
 
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
@@ -51,7 +54,8 @@ public class AppPdfViewer {
 	private BufferedImage iconPdf;
 	private Logger LOG = Logger.getLogger(AppDateField.class);
 
-	public AppPdfViewer(JDesktopPane desktopPane,JPanel taskbar) throws AviculturaException {
+	public AppPdfViewer(JDesktopPane desktopPane, JPanel taskbar)
+			throws AviculturaException {
 		this.desktopPane = desktopPane;
 		pageCountNow = 1;
 		internalFrame = new AviInternalFrame(taskbar);
@@ -115,7 +119,7 @@ public class AppPdfViewer {
 	 * @throws AviculturaException
 	 * @wbp.parser.entryPoint
 	 */
-	public void showPdf(File file) throws AviculturaException {
+	public void showPdf(final File file) throws AviculturaException {
 		this.file = file;
 
 		internalFrame.getContentPane().setBackground(
@@ -184,7 +188,9 @@ public class AppPdfViewer {
 			public void actionPerformed(ActionEvent arg0) {
 
 				try {
-					print();
+					// print();
+					//print2(file);
+					PrintPdf.print(file);
 				} catch (AviculturaException e) {
 					e.viewError(internalFrame);
 				}
@@ -248,19 +254,54 @@ public class AppPdfViewer {
 
 	}
 
+	private void print2(File f) throws AviculturaException {
+
+		try {
+			// Create a PDFFile from a File reference
+			// File f = new File("c:\\juixe\\techknow.pdf");
+			FileInputStream fis = new FileInputStream(f);
+			FileChannel fc = fis.getChannel();
+			ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+			PDFFile pdfFile = new PDFFile(bb); // Create PDF Print Page
+			PDFPrintPage pages = new PDFPrintPage(pdfFile);
+
+			// Create Print Job
+			PrinterJob pjob = PrinterJob.getPrinterJob();
+			PageFormat pf = PrinterJob.getPrinterJob().defaultPage();
+			pjob.setJobName(f.getName());
+			Book book = new Book();
+			book.append(pages, pf, pdfFile.getNumPages());
+			pjob.setPageable(book);
+
+			// Send print job to default printer
+			if (pjob.printDialog()) {
+				pjob.print();
+			}
+		} catch (IOException e) {
+			throw new AviculturaException(AviculturaException.PDF_ERROR,
+					"IO error PDF Viewer ", e);
+		} catch (PrinterException e) {
+			throw new AviculturaException(AviculturaException.PDF_ERROR,
+					"IO error PDF Viewer ", e);
+		}
+	}
+
 	private void print() throws AviculturaException {
 		PDFPrintPage pages = new PDFPrintPage(pdffile);
 
 		// Create Print Job
 		PrinterJob pjob = PrinterJob.getPrinterJob();
 		PageFormat pf = PrinterJob.getPrinterJob().defaultPage();
-		pf.setOrientation(PageFormat.LANDSCAPE);
+		pf.setOrientation(PageFormat.PORTRAIT);
 
 		Paper paper = new Paper();
 		// Set to A4 size.
-		paper.setSize(594.936, 841.536);
+		// paper.setSize(594.936, 841.536);
+		paper.setSize(841.536, 594.936);
+
 		// Set the margins.
-		paper.setImageableArea(0, 0, 594.936, 841.536);
+		// paper.setImageableArea(0, 0, 594.936, 841.536);
+		paper.setImageableArea(0, 0, 841.536, 594.936);
 		pf.setPaper(paper);
 
 		pjob.setJobName(file.getName());

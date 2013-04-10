@@ -154,7 +154,7 @@ public class DbHelper {
 		}
 
 		try {
-			searchRingStmt = con.prepareStatement(searchRingSql);
+			
 			searchBirdspeciesNameStmt = con
 					.prepareStatement(searchBirdspeciesNameSql);
 
@@ -188,6 +188,7 @@ public class DbHelper {
 			getChildsStmt = con.prepareStatement(getChildsSql);
 
 			importStmt = con.prepareStatement(importSql);
+			searchRingStmt = con.prepareStatement(searchRingSql);
 
 		} catch (SQLException e) {
 			throw new AviculturaException(
