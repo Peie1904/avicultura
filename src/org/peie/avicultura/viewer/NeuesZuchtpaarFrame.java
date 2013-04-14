@@ -44,8 +44,7 @@ public class NeuesZuchtpaarFrame {
 	 * @wbp.parser.entryPoint
 	 */
 	public void showFrame() {
-		internalFrame = new AviInternalFrame(taskBar,
-				"Neues Zuchtpaar");
+		internalFrame = new AviInternalFrame(taskBar, "Neues Zuchtpaar");
 
 		Dimension screenDesktop = desktopPane.getSize();
 
@@ -121,74 +120,111 @@ public class NeuesZuchtpaarFrame {
 		internalFrame.getContentPane().add(send);
 
 		desktopPane.add(internalFrame);
-		
+
 		send.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String mutter = mutterVogelField.getText();
 				String vatter = vaterVogelField.getText();
-				
-				
-				
+
 				int code = 1;
-				
+
 				try {
 					code = dbhelper.checkBirdPair(vatter, mutter);
 				} catch (AviculturaException e) {
-					
+
 					e.viewError(internalFrame);
 				}
-				
-				if (code == DbHelper.CHECK_VATER_NOT){
+
+				System.out.println("code: " + code);
+
+				switch (code) {
+				case DbHelper.CHECK_VATER_NOT:
 					JOptionPane.showMessageDialog(internalFrame,
-							"Kann Vater nicht finden: "+vatter, "Fehler",
+							"Kann Vater nicht finden: " + vatter, "Fehler",
 							JOptionPane.ERROR_MESSAGE);
-				}
-				
-				if (code == DbHelper.CHECK_MUTTER_NOT){
+					break;
+				case DbHelper.CHECK_MUTTER_NOT:
 					JOptionPane.showMessageDialog(internalFrame,
-							"Kann Mutter nicht finden: "+mutter, "Fehler",
+							"Kann Mutter nicht finden: " + mutter, "Fehler",
 							JOptionPane.ERROR_MESSAGE);
-				}
-				
-				if (code == DbHelper.CHECK_GENDER_NOT){
+					break;
+				case DbHelper.CHECK_GENDER_NOT:
 					JOptionPane.showMessageDialog(internalFrame,
 							"Beide Vögel vom selben Geschlecht", "Fehler",
 							JOptionPane.ERROR_MESSAGE);
-				}
-				
-				if (code == DbHelper.CHECK_GENDER_NOT_10){
+					break;
+				case DbHelper.CHECK_TYPE_NOT_EQUAL:
+					JOptionPane.showMessageDialog(internalFrame,
+							"Nicht gleiche Vogelrasse", "Fehler",
+							JOptionPane.ERROR_MESSAGE);
+					break;
+				case DbHelper.CHECK_GENDER_NOT_10:
 					JOptionPane.showMessageDialog(internalFrame,
 							"Vater kein Hahn", "Fehler",
 							JOptionPane.ERROR_MESSAGE);
-				}
-				
-				if (code == DbHelper.CHECK_GENDER_NOT_01){
+					break;
+				case DbHelper.CHECK_GENDER_NOT_01:
 					JOptionPane.showMessageDialog(internalFrame,
 							"Mutter keine Henne", "Fehler",
 							JOptionPane.ERROR_MESSAGE);
-				}
-				
-				if (code == DbHelper.CHECK_PAIR_EXSISTS){
-					JOptionPane.showMessageDialog(internalFrame,
-							"Paar schon vorhanden", "Fehler",
-							JOptionPane.ERROR_MESSAGE);
-				}
-				
-				if (code == 0){
-					JOptionPane.showMessageDialog(internalFrame,
-							"Paar: "+vatter+" "+mutter, "Paar angelegt",
+					break;
+				case 0:
+					JOptionPane.showMessageDialog(internalFrame, "Paar: "
+							+ vatter + " " + mutter, "Paar angelegt",
 							JOptionPane.PLAIN_MESSAGE);
-					
+
 					mutterVogelField.setText("");
 					vaterVogelField.setText("");
+					break;
+				default:
+					JOptionPane.showMessageDialog(internalFrame, "Code: "
+							+ code, "Fehler", JOptionPane.ERROR_MESSAGE);
+					break;
 				}
-				
-				
-				
-				
-				
+
+				/*
+				 * if (code == DbHelper.CHECK_VATER_NOT) {
+				 * JOptionPane.showMessageDialog(internalFrame,
+				 * "Kann Vater nicht finden: " + vatter, "Fehler",
+				 * JOptionPane.ERROR_MESSAGE); }
+				 * 
+				 * if (code == DbHelper.CHECK_MUTTER_NOT) {
+				 * JOptionPane.showMessageDialog(internalFrame,
+				 * "Kann Mutter nicht finden: " + mutter, "Fehler",
+				 * JOptionPane.ERROR_MESSAGE); }
+				 * 
+				 * if (code == DbHelper.CHECK_GENDER_NOT) {
+				 * JOptionPane.showMessageDialog(internalFrame,
+				 * "Beide Vögel vom selben Geschlecht", "Fehler",
+				 * JOptionPane.ERROR_MESSAGE); }
+				 * 
+				 * if (code == DbHelper.CHECK_TYPE_NOT_EQUAL) {
+				 * JOptionPane.showMessageDialog(internalFrame,
+				 * "Nicht gleiche Vogelrasse", "Fehler",
+				 * JOptionPane.ERROR_MESSAGE); }
+				 * 
+				 * if (code == DbHelper.CHECK_GENDER_NOT_10) {
+				 * JOptionPane.showMessageDialog(internalFrame,
+				 * "Vater kein Hahn", "Fehler", JOptionPane.ERROR_MESSAGE); }
+				 * 
+				 * if (code == DbHelper.CHECK_GENDER_NOT_01) {
+				 * JOptionPane.showMessageDialog(internalFrame,
+				 * "Mutter keine Henne", "Fehler", JOptionPane.ERROR_MESSAGE); }
+				 * 
+				 * if (code == DbHelper.CHECK_PAIR_EXSISTS) {
+				 * JOptionPane.showMessageDialog(internalFrame,
+				 * "Paar schon vorhanden", "Fehler", JOptionPane.ERROR_MESSAGE);
+				 * }
+				 * 
+				 * if (code == 0) { JOptionPane.showMessageDialog(internalFrame,
+				 * "Paar: " + vatter + " " + mutter, "Paar angelegt",
+				 * JOptionPane.PLAIN_MESSAGE);
+				 * 
+				 * mutterVogelField.setText(""); vaterVogelField.setText(""); }
+				 */
+
 			}
 		});
 	}

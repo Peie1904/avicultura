@@ -188,9 +188,9 @@ public class AppPdfViewer {
 			public void actionPerformed(ActionEvent arg0) {
 
 				try {
-					// print();
+					print();
 					//print2(file);
-					PrintPdf.print(file);
+					//PrintPdf.print(file);
 				} catch (AviculturaException e) {
 					e.viewError(internalFrame);
 				}
