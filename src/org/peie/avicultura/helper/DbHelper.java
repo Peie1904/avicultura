@@ -59,13 +59,21 @@ public class DbHelper {
 	private PreparedStatement countDbStmt;
 	private static final String selectListSql = "select *,BIRDSPECIESNAME from birddata,BIRDSPECIES where birddata.birdtypeid = birdspecies.birdtypeid and MODFLAG = 0 order by RINGAT";
 	private PreparedStatement seletctListStmt;
-	private static final String selectStammBlattSql = "select distinct kind.RINGNO kindno,papa.RINGNO papano,mama.RINGNO mamano,art.BIRDSPECIESNAME,"
+	/*private static final String selectStammBlattSql = "select distinct kind.RINGNO kindno,papa.RINGNO papano,mama.RINGNO mamano,art.BIRDSPECIESNAME,"
 			+ " kind.COLOR, kind.RINGAT, kind.GENDER, kind.SELLAT, kind.SELLADRESSE "
 			+ "from BIRDDATA kind,BIRDDATA papa, BIRDDATA mama, BIRDSPECIES art "
 			+ "where kind.RINGNO = ? "
 			+ "and papa.RINGNO = TRIM(LEFT(kind.BIRDFATHER,POSITION(' ',kind.BIRDFATHER))) "
 			+ "and mama.RINGNO = TRIM(LEFT(kind.BIRDMOTHER,POSITION(' ',kind.BIRDMOTHER))) "
-			+ "and art.BIRDTYPEID = kind.BIRDTYPEID and kind.MODFLAG = 0";
+			+ "and art.BIRDTYPEID = kind.BIRDTYPEID and kind.MODFLAG = 0";*/
+	private static final String selectStammBlattSql = "select distinct birddata.RINGNO kindno, " +
+			""+ TABLE_BIRDPAIR +".birdpairfather  papano, "+ TABLE_BIRDPAIR +".birdpairmother mamano," +
+			"birdspecies.BIRDSPECIESNAME, birddata.COLOR, birddata.RINGAT, birddata.GENDER, birddata.SELLAT, " +
+			"birddata.SELLADRESSE from birddata, "+ TABLE_BIRDPAIR +", " +
+			"birdspecies where ringno = ? " +
+			"and birddata.birdtypeid =birdspecies.birdtypeid " +
+			"and birddata.birdpairid = birdpair_with_year_test.birdpairid " +
+			"and birddata.modflag = 0";
 	private PreparedStatement selectStammBlattStmt;
 	private static final String selectZuchtPaareSql = "select distinct papa.RINGNO paparing, "
 			+ "TRIM(RIGHT(kind.BIRDFATHER,LENGTH(kind.BIRDFATHER)-POSITION(' ',kind.BIRDFATHER))) papavogel, "
