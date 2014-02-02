@@ -180,6 +180,8 @@ public class DbHelper {
 		}
 
 		try {
+			
+			alterBirdPairColumn();
 
 			searchBirdspeciesNameStmt = con
 					.prepareStatement(searchBirdspeciesNameSql);
@@ -234,12 +236,50 @@ public class DbHelper {
 			try {
 				Statement stmt = con.createStatement();
 				stmt.execute(sql);
+				stmt.close();
 			} catch (SQLException e) {
 				log.error("get table error", e);
 				throw new AviculturaException(
 						AviculturaException.SQL_EXECUTION_FAILED,
 						"get table error", e);
 			}
+		}
+
+		return check;
+	}
+
+	private boolean alterBirdPairColumn() throws AviculturaException {
+		String grandFather = "GRANDFATHER";
+		boolean checkGrandFather = existsColumn(TABLE_BIRDPAIR, grandFather);
+		String grandMother = "GRANDMOTHER";
+		boolean checkGrandMother = existsColumn(TABLE_BIRDPAIR, grandMother);
+		
+		boolean check = !checkGrandMother || !checkGrandFather;
+		
+		if (check){
+			
+			log.info("add grandparents");
+
+		String sqlFather = "ALTER TABLE " + TABLE_BIRDPAIR + " ADD "
+				+ grandFather + " bigint";
+		String sqlMother = "ALTER TABLE " + TABLE_BIRDPAIR + " ADD "
+				+ grandMother + " bigint";
+
+		try {
+			Statement stmt = con.createStatement();
+			if (!checkGrandFather) {
+				stmt.execute(sqlFather);
+			}
+			if (!checkGrandMother) {
+				stmt.execute(sqlMother);
+			}
+			stmt.close();
+		} catch (SQLException e) {
+			log.error("get table error", e);
+			throw new AviculturaException(
+					AviculturaException.SQL_EXECUTION_FAILED,
+					"get table error", e);
+		}
 		}
 
 		return check;
