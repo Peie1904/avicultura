@@ -3,6 +3,8 @@ package org.peie.avicultura.viewer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -11,13 +13,19 @@ import java.io.File;
 import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
@@ -28,23 +36,27 @@ import org.peie.avicultura.helper.DbHelper;
 import org.peie.avicultura.helper.Helper;
 import org.peie.avicultura.helper.ZuchtPaareObj;
 import org.peie.avicultura.pdf.AufzuchtBlattWriter;
+import org.peie.avicultura.viewer.Application.PopupPrintListener;
 
 public class ZuchtPaareFrame {
 
 	private JDesktopPane desktopPane;
+	private JFrame frame;
 	private DbHelper dbhelper;
 	private JTable table;
 	private JPanel taskBar;
 	private JTable tableCild;
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
 			"PDF Files", "pdf");
+	public JPopupMenu popup;
 
-	public ZuchtPaareFrame(JDesktopPane desktopPane, DbHelper dbhelper,
-			JPanel taskBar) {
+	public ZuchtPaareFrame(JFrame frame, JDesktopPane desktopPane,
+			DbHelper dbhelper, JPanel taskBar) {
 		super();
 		this.desktopPane = desktopPane;
 		this.dbhelper = dbhelper;
 		this.taskBar = taskBar;
+		this.frame = frame;
 	}
 
 	public void showInternalFrame() throws AviculturaException {
@@ -129,6 +141,17 @@ public class ZuchtPaareFrame {
 					zuchtPaarAnzeige(zuchtPaarId, vater, mutter, vogelType,
 							farbeVater, farbeMutter);
 
+				} else if (e.getClickCount() == 1
+						&& e.getButton() == MouseEvent.BUTTON3) {
+					int x = e.getX();
+					int y = e.getY();
+					table.clearSelection();
+					int selectedRow = table.rowAtPoint(new Point(x, y));
+					table.addRowSelectionInterval(selectedRow, selectedRow);
+					String zuchtPaarId = table.getValueAt(selectedRow, 0)
+							.toString();
+					System.out.println("ZPID " + zuchtPaarId);
+					popUp(zuchtPaarId, internalFrame, selectedRow);
 				}
 
 			}
@@ -137,9 +160,7 @@ public class ZuchtPaareFrame {
 		table.setModel(new DefaultTableModel(inTable, new String[] {
 				"Zuchtpaar", "Vater Ringnr.", "Vater Art", "Vater Farbe",
 				"Mutter Ringnr.", "Mutter Art", "Mutter Farbe" }) {
-			/**
-					 * 
-					 */
+
 			private static final long serialVersionUID = 1L;
 			Class[] columnTypes = new Class[] { Integer.class, String.class,
 					String.class, Object.class, Object.class, Object.class,
@@ -162,6 +183,75 @@ public class ZuchtPaareFrame {
 		internalFrame.getContentPane().add(pane, BorderLayout.CENTER);
 
 		internalFrame.setVisible(true);
+
+	}
+
+	private void deleteZuchtPaar(String zuchtPaarId,
+			AviInternalFrame internalFrame, int selectedRow) {
+
+		int check = JOptionPane.showConfirmDialog(frame, "Brutpaar "
+				+ zuchtPaarId + " löschen", "Brutpaar löschen?",
+				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
+				new ImageIcon(Application.iconDelete));
+		if (check == 0) {
+			try {
+				if (dbhelper.deleteBirdPair(zuchtPaarId)) {
+					JOptionPane.showMessageDialog(frame, "Brutpaar"
+							+ zuchtPaarId + " wurde gelöscht",
+							"Brutpaar gelöscht", JOptionPane.PLAIN_MESSAGE,
+							new ImageIcon(Application.iconDelete));
+					((DefaultTableModel) table.getModel())
+							.removeRow(selectedRow);
+
+				} else {
+					JOptionPane.showMessageDialog(frame, "Brutpaar"
+							+ zuchtPaarId + " wurde NICHT gelöscht",
+							"Brutpaar NICHT gelöscht",
+							JOptionPane.ERROR_MESSAGE, new ImageIcon(
+									Application.iconDelete));
+				}
+			} catch (AviculturaException e) {
+				e.viewError(internalFrame);
+			}
+		}
+
+	}
+
+	private void popUp(final String zuchtPaarId,
+			final AviInternalFrame internalFrame, final int selectedRow) {
+		popup = new JPopupMenu();
+		JLabel popUpLabel = new JLabel("Zuchtpaar: " + zuchtPaarId);
+		popUpLabel.setFont(new Font(Application.LABEL_FONT,
+				Application.LABEL_FONT_STYLE, Application.LABEL_FONT_SIZE));
+		ActionListener menuListener = new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+
+				if (event.getActionCommand().toString()
+						.equals(Application.LOESCHEN)) {
+					deleteZuchtPaar(zuchtPaarId, internalFrame, selectedRow);
+				}
+
+			}
+		};
+
+		popup.add(popUpLabel);
+		JMenuItem item;
+		popup.add(item = new JMenuItem(Application.LOESCHEN, new ImageIcon(
+				Application.iconDelete)));
+		item.setHorizontalTextPosition(JMenuItem.RIGHT);
+		item.addActionListener(menuListener);
+		item.setFont(new Font(Application.LABEL_FONT,
+				Application.LABEL_FONT_STYLE, Application.LABEL_FONT_SIZE));
+		popup.setLabel("Justification");
+		popup.setBorder(new BevelBorder(BevelBorder.RAISED));
+		// popup.addPopupMenuListener(new PopupPrintListener());
+
+		Point mousePos = MouseInfo.getPointerInfo().getLocation();
+
+		int xMouse = mousePos.x;// + 40;
+		int yMouse = mousePos.y;// + 10;
+
+		popup.show(frame, xMouse, yMouse);
 
 	}
 
@@ -219,8 +309,6 @@ public class ZuchtPaareFrame {
 		JButton btnAuzuchtList = new JButton("Zuchtpaar drucken");
 		btnAuzuchtList.setBounds(210, 387, 189, 23);
 		internalFrame.getContentPane().add(btnAuzuchtList);
-		
-		
 
 		try {
 			List<ChildObj> coList = dbhelper.getChilds(zuchtPaarId);
@@ -352,7 +440,7 @@ public class ZuchtPaareFrame {
 						AufzuchtBlattWriter abw = new AufzuchtBlattWriter(
 								vogelType, vater, mutter, farbeVater,
 								farbeMutter, zuchtPaarId, aufzuchtBlatt);
-						
+
 						abw.writeAufzuchtPaarListe(dbhelper);
 
 						AppPdfViewer viewer = new AppPdfViewer(desktopPane,

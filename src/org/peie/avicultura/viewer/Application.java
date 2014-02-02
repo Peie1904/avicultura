@@ -87,11 +87,11 @@ public class Application {
 	public static final String ICONS_SKY_LIGHT_ICONS_PNG_16X16_ACTIVE_ABOUT_PNG = "icons/skyLight/icons/PNG/16x16/_active__about.png";
 
 	private static final String KOPIEREN = "Kopieren";
-	private static final String LOESCHEN = "Löschen";
+	public static final String LOESCHEN = "Löschen";
 	private static final String BEARBEITEN = "Bearbeiten";
-	private static final int LABEL_FONT_STYLE = Font.PLAIN;
-	private static final String LABEL_FONT = "Arial";
-	private static final int LABEL_FONT_SIZE = 11;
+	public static final int LABEL_FONT_STYLE = Font.PLAIN;
+	public static final String LABEL_FONT = "Arial";
+	public static final int LABEL_FONT_SIZE = 11;
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter(
 			"PDF Files", "pdf");
 
@@ -104,7 +104,7 @@ public class Application {
 
 	private JDesktopPane desktopPane;
 	private DbHelper dbhelper;
-	private BufferedImage icon, iconNewBird, iconFindBird, iconError,
+	public static BufferedImage icon, iconNewBird, iconFindBird, iconError,
 			iconDelete, iconEdit, iconEditBig;
 	private JPanel navigator;
 	private JPanel taskbar;
@@ -117,6 +117,7 @@ public class Application {
 	private BufferedImage iconSettings;
 	private BufferedImage iconAbout;
 	private AviProperties properties;
+	private int selectedRowNow = -1;
 
 	public Application(AviProperties properties) {
 		this.properties = properties;
@@ -360,7 +361,7 @@ public class Application {
 
 				System.out.println("ZUCHTPAARE");
 
-				ZuchtPaareFrame zpf = new ZuchtPaareFrame(desktopPane,
+				ZuchtPaareFrame zpf = new ZuchtPaareFrame(frame,desktopPane,
 						dbhelper, taskbar);
 
 				try {
@@ -744,6 +745,7 @@ public class Application {
 				if (e.getClickCount() == 2
 						&& e.getButton() == MouseEvent.BUTTON1) {
 					int row = table.getSelectedRow();
+					selectedRowNow = row;
 					String ringNo = table.getValueAt(row, 0).toString();
 
 					// editBird(ringNo);
@@ -758,6 +760,7 @@ public class Application {
 
 					table.clearSelection();
 					int fire = table.rowAtPoint(new Point(x, y));
+					selectedRowNow = fire;
 					table.addRowSelectionInterval(fire, fire);
 					String ringNo = table.getValueAt(fire, 0).toString();
 
@@ -818,7 +821,7 @@ public class Application {
 		}
 	}
 
-	private void deleteBird(String ringNo) throws AviculturaException {
+	private void deleteBird(String ringNo,int selectedRow) throws AviculturaException {
 		int check = JOptionPane.showConfirmDialog(frame, "Ring Nr.: " + ringNo,
 				"Vogel löschen?", JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE, new ImageIcon(iconDelete));
@@ -829,6 +832,11 @@ public class Application {
 				JOptionPane.showMessageDialog(frame, "Ringnr.: " + ringNo,
 						"Vogel gelöscht", JOptionPane.PLAIN_MESSAGE,
 						new ImageIcon(icon));
+				LOG.info("selectedRow "+selectedRow);
+				if (selectedRow >= 0){
+				((DefaultTableModel) table.getModel())
+				.removeRow(selectedRow);
+				}
 			}
 		}
 	}
@@ -899,7 +907,7 @@ public class Application {
 					}
 
 					if (event.getActionCommand().toString().equals(LOESCHEN)) {
-						deleteBird(popUpLabel.getText());
+						deleteBird(popUpLabel.getText(),selectedRowNow);
 					}
 
 					if (event.getActionCommand().toString()

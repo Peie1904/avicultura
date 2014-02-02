@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.security.auth.kerberos.DelegationPermission;
+
 import org.apache.log4j.Logger;
 import org.peie.avicultura.main.Avicultura;
 import org.peie.avicultura.viewer.AppNewBirdWindow;
@@ -59,21 +61,31 @@ public class DbHelper {
 	private PreparedStatement countDbStmt;
 	private static final String selectListSql = "select *,BIRDSPECIESNAME from birddata,BIRDSPECIES where birddata.birdtypeid = birdspecies.birdtypeid and MODFLAG = 0 order by RINGAT";
 	private PreparedStatement seletctListStmt;
-	/*private static final String selectStammBlattSql = "select distinct kind.RINGNO kindno,papa.RINGNO papano,mama.RINGNO mamano,art.BIRDSPECIESNAME,"
-			+ " kind.COLOR, kind.RINGAT, kind.GENDER, kind.SELLAT, kind.SELLADRESSE "
-			+ "from BIRDDATA kind,BIRDDATA papa, BIRDDATA mama, BIRDSPECIES art "
-			+ "where kind.RINGNO = ? "
-			+ "and papa.RINGNO = TRIM(LEFT(kind.BIRDFATHER,POSITION(' ',kind.BIRDFATHER))) "
-			+ "and mama.RINGNO = TRIM(LEFT(kind.BIRDMOTHER,POSITION(' ',kind.BIRDMOTHER))) "
-			+ "and art.BIRDTYPEID = kind.BIRDTYPEID and kind.MODFLAG = 0";*/
-	private static final String selectStammBlattSql = "select distinct birddata.RINGNO kindno, " +
-			""+ TABLE_BIRDPAIR +".birdpairfather  papano, "+ TABLE_BIRDPAIR +".birdpairmother mamano," +
-			"birdspecies.BIRDSPECIESNAME, birddata.COLOR, birddata.RINGAT, birddata.GENDER, birddata.SELLAT, " +
-			"birddata.SELLADRESSE from birddata, "+ TABLE_BIRDPAIR +", " +
-			"birdspecies where ringno = ? " +
-			"and birddata.birdtypeid =birdspecies.birdtypeid " +
-			"and birddata.birdpairid = birdpair_with_year_test.birdpairid " +
-			"and birddata.modflag = 0";
+	/*
+	 * private static final String selectStammBlattSql =
+	 * "select distinct kind.RINGNO kindno,papa.RINGNO papano,mama.RINGNO mamano,art.BIRDSPECIESNAME,"
+	 * + " kind.COLOR, kind.RINGAT, kind.GENDER, kind.SELLAT, kind.SELLADRESSE "
+	 * + "from BIRDDATA kind,BIRDDATA papa, BIRDDATA mama, BIRDSPECIES art " +
+	 * "where kind.RINGNO = ? " +
+	 * "and papa.RINGNO = TRIM(LEFT(kind.BIRDFATHER,POSITION(' ',kind.BIRDFATHER))) "
+	 * +
+	 * "and mama.RINGNO = TRIM(LEFT(kind.BIRDMOTHER,POSITION(' ',kind.BIRDMOTHER))) "
+	 * + "and art.BIRDTYPEID = kind.BIRDTYPEID and kind.MODFLAG = 0";
+	 */
+	private static final String selectStammBlattSql = "select distinct birddata.RINGNO kindno, "
+			+ ""
+			+ TABLE_BIRDPAIR
+			+ ".birdpairfather  papano, "
+			+ TABLE_BIRDPAIR
+			+ ".birdpairmother mamano,"
+			+ "birdspecies.BIRDSPECIESNAME, birddata.COLOR, birddata.RINGAT, birddata.GENDER, birddata.SELLAT, "
+			+ "birddata.SELLADRESSE from birddata, "
+			+ TABLE_BIRDPAIR
+			+ ", "
+			+ "birdspecies where ringno = ? "
+			+ "and birddata.birdtypeid =birdspecies.birdtypeid "
+			+ "and birddata.birdpairid = birdpair_with_year_test.birdpairid "
+			+ "and birddata.modflag = 0";
 	private PreparedStatement selectStammBlattStmt;
 	private static final String selectZuchtPaareSql = "select distinct papa.RINGNO paparing, "
 			+ "TRIM(RIGHT(kind.BIRDFATHER,LENGTH(kind.BIRDFATHER)-POSITION(' ',kind.BIRDFATHER))) papavogel, "
@@ -134,17 +146,23 @@ public class DbHelper {
 	private static final String getBirdPairYearSql = "select birdPairYear from "
 			+ TABLE_BIRDPAIR + " where birdPairId = ?";
 	private PreparedStatement getBirdPairYearStmt;
-	private static final String getBirdPairAllSql = "select distinct "+ TABLE_BIRDPAIR +".*,BIRDDATA.BIRDTYPEID," +
-			"BIRDSPECIES.BIRDSPECIESNAME " +
-			"from "+ TABLE_BIRDPAIR +",BIRDDATA,BIRDSPECIES " +
-			"where "+ TABLE_BIRDPAIR +".BIRDPAIRFATHER = BIRDDATA.RINGNO " +
-			"and BIRDDATA.BIRDTYPEID = BIRDSPECIES.BIRDTYPEID " +
-			"and BIRDSPECIES.BIRDSPECIESNAME like ? order by "+ TABLE_BIRDPAIR +".BIRDPAIRID desc";
+	private static final String getBirdPairAllSql = "select distinct "
+			+ TABLE_BIRDPAIR + ".*,BIRDDATA.BIRDTYPEID,"
+			+ "BIRDSPECIES.BIRDSPECIESNAME " + "from " + TABLE_BIRDPAIR
+			+ ",BIRDDATA,BIRDSPECIES " + "where " + TABLE_BIRDPAIR
+			+ ".BIRDPAIRFATHER = BIRDDATA.RINGNO "
+			+ "and BIRDDATA.BIRDTYPEID = BIRDSPECIES.BIRDTYPEID "
+			+ "and BIRDSPECIES.BIRDSPECIESNAME like ? order by "
+			+ TABLE_BIRDPAIR + ".BIRDPAIRID desc";
 	private PreparedStatement getBirdPairAllStmt;
-	
-	private static final String getChildsSql = "select RINGNO,RINGAT,COLOR,GENDER from BIRDDATA where BIRDPAIRID = ? and MODFLAG = 0";
+
+	private static final String getChildsSql = "select RINGNO,RINGAT,COLOR,GENDER from BIRDDATA where BIRDPAIRID = ? and MODFLAG = 0 order by RINGNO";
 	private PreparedStatement getChildsStmt;
-	
+
+	private static final String deleteBirdPairSql = "delete from "
+			+ TABLE_BIRDPAIR + " where birdPairId = ?";
+	private PreparedStatement deleteBirdPairStmt;
+
 	private String YEAR_NOW;
 
 	public DbHelper(boolean newDb) throws AviculturaException {
@@ -162,7 +180,7 @@ public class DbHelper {
 		}
 
 		try {
-			
+
 			searchBirdspeciesNameStmt = con
 					.prepareStatement(searchBirdspeciesNameSql);
 
@@ -193,6 +211,7 @@ public class DbHelper {
 
 			getBirdPairYearStmt = con.prepareStatement(getBirdPairYearSql);
 			getBirdPairAllStmt = con.prepareStatement(getBirdPairAllSql);
+			deleteBirdPairStmt = con.prepareStatement(deleteBirdPairSql);
 			getChildsStmt = con.prepareStatement(getChildsSql);
 
 			importStmt = con.prepareStatement(importSql);
@@ -727,6 +746,7 @@ public class DbHelper {
 			updateBirdPairStmt.close();
 			getBirdPairYearStmt.close();
 			getBirdPairAllStmt.close();
+			deleteBirdPairStmt.close();
 			getChildsStmt.close();
 			con.close();
 
@@ -741,72 +761,93 @@ public class DbHelper {
 					"can not close connect a empty db", e);
 		}
 	}
-	
-	public List<ChildObj> getChilds(String brutPaar) throws AviculturaException{
-		
+
+	public boolean deleteBirdPair(String zuchtPaarId)
+			throws AviculturaException {
+		int result = 0;
+		int pairid = Helper.parsePairId(zuchtPaarId);
+		try {
+			deleteBirdPairStmt.setInt(1, pairid);
+			result = deleteBirdPairStmt.executeUpdate();
+		} catch (SQLException e) {
+			throw new AviculturaException(
+					AviculturaException.SQL_EXECUTION_FAILED,
+					"database error: " + e.getLocalizedMessage(), e);
+		}
+
+		if (result > 0) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	public List<ChildObj> getChilds(String brutPaar) throws AviculturaException {
+
 		List<ChildObj> coList = new ArrayList<ChildObj>();
-		
+
 		try {
 			getChildsStmt.setInt(1, Helper.parsePairId(brutPaar));
-			
+
 			ResultSet res = getChildsStmt.executeQuery();
-			
-			while (res.next()){
-				
+
+			while (res.next()) {
+
 				ChildObj co = new ChildObj();
 				co.setRINGNO(res.getString("RINGNO"));
 				co.setRINGAT(res.getLong("RINGAT"));
 				co.setCOLOR(res.getString("COLOR"));
 				co.setGENDER(res.getDouble("GENDER"));
-				
+
 				coList.add(co);
-				
-				log.info(""+res.getString("RINGNO"));
-				
-				
-				
+
+				log.info("" + res.getString("RINGNO"));
+
 			}
-			
+
 			res.close();
 		} catch (SQLException e) {
 			throw new AviculturaException(
 					AviculturaException.SQL_EXECUTION_FAILED,
 					"database error: " + e.getLocalizedMessage(), e);
 		}
-		
+
 		return coList;
-		
+
 	}
-	
-	public List<ZuchtPaarAuswahlObj> getBirdPairAll(String birdType) throws AviculturaException{
-		
+
+	public List<ZuchtPaarAuswahlObj> getBirdPairAll(String birdType)
+			throws AviculturaException {
+
 		List<ZuchtPaarAuswahlObj> list = new ArrayList<ZuchtPaarAuswahlObj>();
-		
+
 		try {
 			getBirdPairAllStmt.setString(1, birdType);
 			ResultSet res = getBirdPairAllStmt.executeQuery();
-			
-			while (res.next()){
+
+			while (res.next()) {
 				log.info(res.getInt("BIRDPAIRID"));
-				
+
 				ZuchtPaarAuswahlObj zpao = new ZuchtPaarAuswahlObj();
-				
-				zpao.setPaarId(res.getInt("BIRDPAIRID")+"-"+res.getInt("BIRDPAIRYEAR"));
+
+				zpao.setPaarId(res.getInt("BIRDPAIRID") + "-"
+						+ res.getInt("BIRDPAIRYEAR"));
 				zpao.setFather(res.getString("BIRDPAIRFATHER"));
 				zpao.setMother(res.getString("BIRDPAIRMOTHER"));
-				
+
 				list.add(zpao);
 			}
-			
+
 			res.close();
 		} catch (SQLException e) {
 			throw new AviculturaException(
 					AviculturaException.SQL_EXECUTION_FAILED,
 					"database error: " + e.getLocalizedMessage(), e);
 		}
-		
+
 		return list;
-		
+
 	}
 
 	public String getBirdPairNo(int birdPairId) throws AviculturaException {
