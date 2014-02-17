@@ -26,9 +26,11 @@ public class NeuesZuchtpaarFrame {
 	private JDesktopPane desktopPane;
 	private DbHelper dbhelper;
 	private JPanel taskBar;
-	private final static int fieldLength = 15;
+	private final static int fieldLength = 20;
 	private JTextField mutterVogelField;
 	private JTextField vaterVogelField;
+	private JTextField omaVogelField;
+	private JTextField opaVogelField;
 	private AviInternalFrame internalFrame;
 
 	public NeuesZuchtpaarFrame(JDesktopPane desktopPane, DbHelper dbhelper,
@@ -48,8 +50,8 @@ public class NeuesZuchtpaarFrame {
 
 		Dimension screenDesktop = desktopPane.getSize();
 
-		int heigth = 150;// screenDesktop.height - 400;
-		int width = 300;// screenDesktop.width - 400;
+		int heigth = 200;// screenDesktop.height - 400;
+		int width = 350;// screenDesktop.width - 400;
 
 		Dimension minSize = new Dimension(300, 300);
 
@@ -107,13 +109,60 @@ public class NeuesZuchtpaarFrame {
 		gbc.gridy = 1;
 
 		gbl.setConstraints(mutterVogelField, gbc);
-
+		
 		internalFrame.getContentPane().add(mutterVogelField);
+		
+		//------
+		
+		Label grossMutterVogel = new Label("Groﬂmutter Vogel: ");
+		grossMutterVogel.setSize(new Dimension(150, 150));
+
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+
+		gbl.setConstraints(grossMutterVogel, gbc);
+		internalFrame.add(grossMutterVogel);
+
+		omaVogelField = new JTextField();
+
+		omaVogelField.setColumns(fieldLength);
+
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+
+		gbl.setConstraints(omaVogelField, gbc);
+		
+		internalFrame.getContentPane().add(omaVogelField);
+		
+		//------
+		Label grossVaterVogel = new Label("Groﬂvater Vogel: ");
+		grossVaterVogel.setSize(new Dimension(150, 150));
+
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+
+		gbl.setConstraints(grossVaterVogel, gbc);
+		internalFrame.add(grossVaterVogel);
+
+		opaVogelField = new JTextField();
+
+		opaVogelField.setColumns(fieldLength);
+
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+
+		gbl.setConstraints(opaVogelField, gbc);
+		
+		internalFrame.getContentPane().add(opaVogelField);
+		
+		//------
+
+		
 
 		JButton send = new JButton("anlegen");
 
 		gbc.gridx = 1;
-		gbc.gridy = 2;
+		gbc.gridy = 4;
 
 		gbl.setConstraints(send, gbc);
 
@@ -127,11 +176,13 @@ public class NeuesZuchtpaarFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				String mutter = mutterVogelField.getText();
 				String vatter = vaterVogelField.getText();
+				String opa = opaVogelField.getText();
+				String oma = omaVogelField.getText();
 
 				int code = 1;
 
 				try {
-					code = dbhelper.checkBirdPair(vatter, mutter);
+					code = dbhelper.checkBirdPair(vatter, mutter,opa,oma);
 				} catch (AviculturaException e) {
 
 					e.viewError(internalFrame);

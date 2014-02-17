@@ -1,6 +1,7 @@
 package org.peie.avicultura.helper;
 
 public class ZuchtPaareObj {
+	private static final String N_A = "";
 	private String paparing;
 	private String papavogel;
 	private String papafarbe;
@@ -9,6 +10,8 @@ public class ZuchtPaareObj {
 	private String mamafarbe;
 	private String birdpairno = "0";
 	private String BIRDDATAID;
+	private String grandMother;
+	private String grandFather;
 
 	public String getBIRDDATAID() {
 		return BIRDDATAID;
@@ -73,5 +76,34 @@ public class ZuchtPaareObj {
 	public void setMamafarbe(String mamafarbe) {
 		this.mamafarbe = mamafarbe;
 	}
+
+	public String getGrandMother() {
+		return grandMother;
+	}
+
+	public void setGrandMother(String grandMother) {
+		if (grandMother == null){
+			this.grandMother = N_A;
+		}else{
+			this.grandMother = grandMother;
+		}
+		
+	}
+
+	public String getGrandFather() {
+		return grandFather;
+	}
+
+	public void setGrandFather(String grandFather) {
+		if (grandFather == null){
+			this.grandFather = N_A;
+		}else{
+			this.grandFather = grandFather;
+		}
+		
+		//this.grandFather = grandFather;
+	}
+	
+	
 
 }

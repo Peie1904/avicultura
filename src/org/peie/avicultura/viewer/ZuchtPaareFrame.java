@@ -83,7 +83,7 @@ public class ZuchtPaareFrame {
 
 		List<ZuchtPaareObj> zpoList = dbhelper.getZuchtPaareDataForTable();
 
-		final Object[][] inTable = new Object[zpoList.size()][8];
+		final Object[][] inTable = new Object[zpoList.size()][9];
 
 		int i = 0;
 
@@ -97,6 +97,8 @@ public class ZuchtPaareFrame {
 			inTable[i][4] = zpo.getMamaring();
 			inTable[i][5] = zpo.getMamavogel();
 			inTable[i][6] = zpo.getMamafarbe();
+			inTable[i][7] = zpo.getGrandFather();
+			inTable[i][8] = zpo.getGrandMother();
 
 			i++;
 		}
@@ -138,8 +140,11 @@ public class ZuchtPaareFrame {
 					String farbeVater = table.getValueAt(row, 3).toString();
 					String farbeMutter = table.getValueAt(row, 6).toString();
 
+					String opa = table.getValueAt(row, 7).toString();
+					String oma = table.getValueAt(row, 8).toString();
+
 					zuchtPaarAnzeige(zuchtPaarId, vater, mutter, vogelType,
-							farbeVater, farbeMutter);
+							farbeVater, farbeMutter, opa, oma);
 
 				} else if (e.getClickCount() == 1
 						&& e.getButton() == MouseEvent.BUTTON3) {
@@ -157,14 +162,14 @@ public class ZuchtPaareFrame {
 			}
 		});
 
-		table.setModel(new DefaultTableModel(inTable, new String[] {
-				"Zuchtpaar", "Vater Ringnr.", "Vater Art", "Vater Farbe",
-				"Mutter Ringnr.", "Mutter Art", "Mutter Farbe" }) {
+		table.setModel(new DefaultTableModel(inTable, new String[]{"Zuchtpaar",
+				"Vater Ringnr.", "Vater Art", "Vater Farbe", "Mutter Ringnr.",
+				"Mutter Art", "Mutter Farbe", "Opa", "Oma"}) {
 
 			private static final long serialVersionUID = 1L;
-			Class[] columnTypes = new Class[] { Integer.class, String.class,
+			Class[] columnTypes = new Class[]{Integer.class, String.class,
 					String.class, Object.class, Object.class, Object.class,
-					Object.class, Object.class, Long.class };
+					Object.class, Object.class, Object.class};
 
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
@@ -257,7 +262,8 @@ public class ZuchtPaareFrame {
 
 	private void zuchtPaarAnzeige(final String zuchtPaarId, final String vater,
 			final String mutter, final String vogelType,
-			final String farbeVater, final String farbeMutter) {
+			final String farbeVater, final String farbeMutter,
+			final String opa, final String oma) {
 
 		int heigth = 500;// screenDesktop.height - 200;
 		int width = 540;// screenDesktop.width - 200;
@@ -282,19 +288,39 @@ public class ZuchtPaareFrame {
 		internalFrame.getContentPane().setLayout(null);
 
 		JLabel lblVater = new JLabel("Vater: ");
-		lblVater.setBounds(10, 36, 46, 14);
+		lblVater.setBounds(10, 36, 90, 14);
 		internalFrame.getContentPane().add(lblVater);
 
+		if (opa.length() > 0) {
+			JLabel lblGrossVater = new JLabel("Groﬂvater: ");
+			lblGrossVater.setBounds(10, 56, 90, 14);
+			internalFrame.getContentPane().add(lblGrossVater);
+
+			JLabel label_3 = new JLabel(opa);
+			label_3.setBounds(95, 56, 86, 14);
+			internalFrame.getContentPane().add(label_3);
+		}
+
 		JLabel label = new JLabel(vater);
-		label.setBounds(55, 36, 86, 14);
+		label.setBounds(95, 36, 86, 14);
 		internalFrame.getContentPane().add(label);
 
 		JLabel lblMutter = new JLabel("Mutter:");
-		lblMutter.setBounds(153, 36, 46, 14);
+		lblMutter.setBounds(200, 36, 90, 14);
 		internalFrame.getContentPane().add(lblMutter);
 
+		if (oma.length() > 0) {
+			JLabel lblGrossMutter = new JLabel("Groﬂmutter:");
+			lblGrossMutter.setBounds(200, 56, 90, 14);
+			internalFrame.getContentPane().add(lblGrossMutter);
+
+			JLabel label_2 = new JLabel(oma);
+			label_2.setBounds(300, 56, 86, 14);
+			internalFrame.getContentPane().add(label_2);
+		}
+
 		JLabel label_1 = new JLabel(mutter);
-		label_1.setBounds(209, 36, 86, 14);
+		label_1.setBounds(300, 36, 86, 14);
 		internalFrame.getContentPane().add(label_1);
 
 		JLabel lblNewLabel = new JLabel(vogelType);
@@ -333,16 +359,16 @@ public class ZuchtPaareFrame {
 			tableCild = new JTable();
 
 			tableCild
-					.setModel(new DefaultTableModel(inTable, new String[] {
+					.setModel(new DefaultTableModel(inTable, new String[]{
 							"Lfd.", "Ringnummer", "Beringt am", "Farbe",
-							"Geschlecht" }) {
+							"Geschlecht"}) {
 						/**
 						 * 
 						 */
 						private static final long serialVersionUID = 1L;
-						Class[] columnTypes = new Class[] { Integer.class,
+						Class[] columnTypes = new Class[]{Integer.class,
 								String.class, String.class, Object.class,
-								Object.class };
+								Object.class};
 
 						public Class getColumnClass(int columnIndex) {
 							return columnTypes[columnIndex];
@@ -396,7 +422,8 @@ public class ZuchtPaareFrame {
 					try {
 						AufzuchtBlattWriter abw = new AufzuchtBlattWriter(
 								vogelType, vater, mutter, farbeVater,
-								farbeMutter, zuchtPaarId, aufzuchtBlatt);
+								farbeMutter, zuchtPaarId, opa, oma,
+								aufzuchtBlatt);
 						abw.writeAufzuchtVorlage();
 
 						AppPdfViewer viewer = new AppPdfViewer(desktopPane,
@@ -439,7 +466,8 @@ public class ZuchtPaareFrame {
 					try {
 						AufzuchtBlattWriter abw = new AufzuchtBlattWriter(
 								vogelType, vater, mutter, farbeVater,
-								farbeMutter, zuchtPaarId, aufzuchtBlatt);
+								farbeMutter, zuchtPaarId, opa, oma,
+								aufzuchtBlatt);
 
 						abw.writeAufzuchtPaarListe(dbhelper);
 

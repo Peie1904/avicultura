@@ -36,12 +36,14 @@ public class AufzuchtBlattWriter {
 	private String jahr;
 	private String vogelArt;
 	private Document document;
+	private String opa, oma;
 	private String datum;
 	private static final float PADDING = 5f;
 
 	public AufzuchtBlattWriter(String vogelArt, String vater, String mutter,
 			String farbeVater, String farbeMutter, String zuchtPaarId,
-			File aufzuchtBlatt) throws AviculturaException {
+			String opa, String oma, File aufzuchtBlatt)
+			throws AviculturaException {
 		this.vater = vater;
 		this.mutter = mutter;
 		this.farbeMutter = farbeMutter;
@@ -49,6 +51,8 @@ public class AufzuchtBlattWriter {
 
 		this.zuchtPaarId = zuchtPaarId;
 		this.vogelArt = vogelArt;
+		this.oma = oma;
+		this.opa = opa;
 
 		DateTime dt = new DateTime();
 
@@ -118,7 +122,7 @@ public class AufzuchtBlattWriter {
 	private PdfPTable getCildList(List<ChildObj> coList)
 			throws AviculturaException {
 
-		float[] widths = { 0.2f, 0.2f, 0.2f, 0.2f, 0.2f };
+		float[] widths = {0.2f, 0.2f, 0.2f, 0.2f, 0.2f};
 
 		BaseFont helvetica = null;
 		try {
@@ -199,7 +203,7 @@ public class AufzuchtBlattWriter {
 		int lfd = 0;
 		for (ChildObj co : coList) {
 			lfd++;
-			chunk = new Chunk(""+lfd, font_small_italic);
+			chunk = new Chunk("" + lfd, font_small_italic);
 
 			cell = new PdfPCell(new Paragraph(chunk));
 			cell.setHorizontalAlignment(align);
@@ -293,7 +297,7 @@ public class AufzuchtBlattWriter {
 		Font fontHeadLineSmall = new Font(helveticaBold, 16, Font.HELVETICA);
 		Chunk chunk;
 
-		float[] widths = { 0.1666f, 0.1666f, 0.1666f, 0.1666f, 0.1666f, 0.1666f };
+		float[] widths = {0.1666f, 0.1666f, 0.1666f, 0.1666f, 0.1666f, 0.1666f};
 
 		PdfPTable table = new PdfPTable(widths);
 		table.setWidthPercentage(100);
@@ -452,33 +456,93 @@ public class AufzuchtBlattWriter {
 
 		table.addCell(cell);
 
+		// 4. row
+
+		chunk = new Chunk("Groﬂvater", font_small);
+
+		cell = new PdfPCell(new Paragraph(chunk));
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setBorder(Rectangle.NO_BORDER);
+		cell.setColspan(1);
+		cell.setPadding(PADDING);
+
+		table.addCell(cell);
+
+		chunk = new Chunk(opa, font_small_italic);
+
+		cell = new PdfPCell(new Paragraph(chunk));
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setBorder(Rectangle.NO_BORDER);
+		cell.setColspan(1);
+		cell.setPadding(PADDING);
+
+		table.addCell(cell);
+
+		chunk = new Chunk("", font_small_italic);
+
+		cell = new PdfPCell(new Paragraph(chunk));
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setBorder(Rectangle.NO_BORDER);
+		cell.setColspan(1);
+		cell.setPadding(PADDING);
+
+		table.addCell(cell);
+
+		chunk = new Chunk("", font_small_italic);
+
+		cell = new PdfPCell(new Paragraph(chunk));
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setBorder(Rectangle.NO_BORDER);
+		cell.setColspan(1);
+		cell.setPadding(PADDING);
+
+		table.addCell(cell);
+
+		chunk = new Chunk("Groﬂmutter", font_small);
+
+		cell = new PdfPCell(new Paragraph(chunk));
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setBorder(Rectangle.NO_BORDER);
+		cell.setColspan(1);
+		cell.setPadding(PADDING);
+
+		table.addCell(cell);
+
+		chunk = new Chunk(oma, font_small_italic);
+
+		cell = new PdfPCell(new Paragraph(chunk));
+		cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		cell.setBorder(Rectangle.NO_BORDER);
+		cell.setColspan(1);
+		cell.setPadding(PADDING);
+
+		table.addCell(cell);
+
 		// 5. row
 
-		if (withBoxAndComment) {
-
-			chunk = new Chunk("Bemerkungen:", font_small);
-
-			cell = new PdfPCell(new Paragraph(chunk));
-			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-			cell.setBorder(Rectangle.NO_BORDER);
-			cell.setColspan(6);
-			cell.setPadding(PADDING);
-
-			table.addCell(cell);
-		}else{
-			
-			
-			
-			chunk = new Chunk("Stand: "+datum, font_small);
-
-			cell = new PdfPCell(new Paragraph(chunk));
-			cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-			cell.setBorder(Rectangle.NO_BORDER);
-			cell.setColspan(6);
-			cell.setPadding(PADDING);
-
-			table.addCell(cell);
-		}
+		/*
+		 * if (withBoxAndComment) {
+		 * 
+		 * chunk = new Chunk("Bemerkungen:", font_small);
+		 * 
+		 * cell = new PdfPCell(new Paragraph(chunk));
+		 * cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		 * cell.setBorder(Rectangle.NO_BORDER); cell.setColspan(6);
+		 * cell.setPadding(PADDING);
+		 * 
+		 * table.addCell(cell); }else{
+		 * 
+		 * 
+		 * 
+		 * chunk = new Chunk("Stand: "+datum, font_small);
+		 * 
+		 * cell = new PdfPCell(new Paragraph(chunk));
+		 * cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		 * cell.setBorder(Rectangle.NO_BORDER); cell.setColspan(6);
+		 * cell.setPadding(PADDING);
+		 * 
+		 * table.addCell(cell); }
+		 */
 
 		// 5. row
 
@@ -558,7 +622,7 @@ public class AufzuchtBlattWriter {
 			cell.setPadding(PADDING);
 
 			table.addCell(cell);
-		}else{
+		} else {
 			chunk = new Chunk("", font_small);
 
 			cell = new PdfPCell(new Paragraph(chunk));
@@ -574,9 +638,9 @@ public class AufzuchtBlattWriter {
 	}
 
 	private PdfPTable getAufzuchtTable(int brut) throws AviculturaException {
-		float[] widths = { 0.1428571428571429f, 0.1428571428571429f,
+		float[] widths = {0.1428571428571429f, 0.1428571428571429f,
 				0.1428571428571429f, 0.1428571428571429f, 0.1428571428571429f,
-				0.1428571428571429f, 0.1428571428571429f };
+				0.1428571428571429f, 0.1428571428571429f};
 
 		BaseFont helvetica = null;
 		try {

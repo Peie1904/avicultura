@@ -108,7 +108,7 @@ public class DbHelper {
 	private PreparedStatement selectBirdPairStmt;
 	private static final String insertBirdPairSql = "insert into "
 			+ TABLE_BIRDPAIR
-			+ " (birdPairFATHER,birdPairMOTHER,birdPairYear) values (?,?,?)";
+			+ " (birdPairFATHER,birdPairMOTHER,birdPairYear,GRANDFATHER,GRANDMOTHER) values (?,?,?,?,?)";
 	private PreparedStatement insertBirdPairStmt;
 
 	private static final String selectModflagForBirdSql = "select modflag from birddata where ringno = ? and COLOR = ?";
@@ -124,7 +124,7 @@ public class DbHelper {
 			+ "DISTINCT papa.RINGNO paparing , "
 			+ "vogelpapa.BIRDSPECIESNAME papavogel , papa.COLOR papafarbe , "
 			+ "mama.RINGNO mamaring , vogelmama.BIRDSPECIESNAME mamavogel , "
-			+ "mama.COLOR mamafarbe , paar.BIRDPAIRID BIRDPAIRID,mama.modflag mamamod,papa.modflag papamod,paar.birdPairYear birdPairYear "
+			+ "mama.COLOR mamafarbe , paar.BIRDPAIRID BIRDPAIRID,mama.modflag mamamod,papa.modflag papamod,paar.birdPairYear birdPairYear,paar.GRANDFATHER opa,paar.GRANDMOTHER oma "
 			+ "FROM "
 			+ TABLE_BIRDPAIR
 			+ " paar ,BIRDDATA mama , "
@@ -490,6 +490,8 @@ public class DbHelper {
 				String mamafarbe = res.getString("mamafarbe");
 				String birdpairno = res.getString("BIRDPAIRID") + "-"
 						+ res.getString("birdPairYear");
+				String oma = res.getString("oma");
+				String opa = res.getString("opa");
 
 				long modm = res.getLong("mamamod");
 				long modp = res.getLong("papamod");
@@ -502,6 +504,8 @@ public class DbHelper {
 					zpo.setMamavogel(mamavogel);
 					zpo.setMamafarbe(mamafarbe);
 					zpo.setBirdpairno(birdpairno);
+					zpo.setGrandFather(opa);
+					zpo.setGrandMother(oma);
 					// zpo.setBIRDDATAID(BIRDDATAID);
 
 					zpoList.add(zpo);
@@ -1549,14 +1553,14 @@ public class DbHelper {
 	public final static int CHECK_GENDER_NOT_01 = -6;
 	public final static int CHECK_PAIR_EXSISTS = -7;
 
-	public int checkBirdPair(String vater, String mutter)
+	public int checkBirdPair(String vater, String mutter,String opa,String oma)
 			throws AviculturaException {
 		String vaterBirdId = VATER2;
 		double vaterGender = 0.0;
 		String mutterBirdId = MUTTER2;
 		double mutterGender = 0.0;
 
-		log.info(vater + " " + mutter);
+		log.info(vater + " " + mutter+" "+opa+" "+oma);
 
 		try {
 			checkBirdPairStmt.setString(1, vater);
@@ -1642,6 +1646,8 @@ public class DbHelper {
 			insertBirdPairStmt.setString(1, vater);
 			insertBirdPairStmt.setString(2, mutter);
 			insertBirdPairStmt.setString(3, YEAR_NOW);
+			insertBirdPairStmt.setString(4, opa);
+			insertBirdPairStmt.setString(5, oma);
 			insertBirdPairStmt.execute();
 		} catch (SQLException e) {
 			throw new AviculturaException(
