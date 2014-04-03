@@ -1,10 +1,12 @@
 package org.peie.avicultura.main;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.peie.avicultura.helper.AviProperties;
 import org.peie.avicultura.helper.AviculturaException;
+import org.peie.avicultura.helper.BackUp;
 import org.peie.avicultura.helper.DbHelper;
 import org.peie.avicultura.viewer.Application;
 
@@ -17,8 +19,12 @@ public abstract class AviculturaUtility {
 
 	public void init(String[] args) throws AviculturaException {
 		LOG.info("init " + Avicultura.APPLICATION);
+		
+		BackUp bu = new BackUp("avi.bu", "aviBackup");
+		
+		File dbFile = new File(Avicultura.DATABASE + H2_DB);
 
-		boolean dbExists = (new File(Avicultura.DATABASE + H2_DB)).exists();
+		boolean dbExists = dbFile.exists();
 
 		LOG.info(dbExists);
 
@@ -27,6 +33,18 @@ public abstract class AviculturaUtility {
 			dbhelper = new DbHelper(true);
 		} else {
 			dbhelper = new DbHelper(false);
+			try {
+				bu.setMaxBackupFiles(10);
+				if(bu.scan()){
+				bu.backup(dbFile.getAbsolutePath());
+				
+				bu.cleanup();
+				}else{
+					LOG.info("No Backup");
+				}
+			} catch (IOException e) {
+				throw new AviculturaException(AviculturaException.APPLICATION_ERROR, e.getMessage(), e);
+			}
 		}
 
 		properties = new AviProperties();

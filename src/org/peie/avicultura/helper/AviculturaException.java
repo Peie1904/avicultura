@@ -5,6 +5,8 @@ import java.awt.Component;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
+
 public class AviculturaException extends Exception {
 
 	/**
@@ -19,14 +21,18 @@ public class AviculturaException extends Exception {
 	public static final int SQL_EXECUTION_FAILED = 2054;
 	public static final int SQL_PREPARATION_FAILED = 2055;
 	public static final int PDF_ERROR = 2056;
-
+	
+	private Logger LOG = Logger.getLogger(getClass());
 	private int errorCode;
 	private String msg;
+	private String errorMsg;
 
 	public AviculturaException(int errorCode, String msg, Throwable e) {
 		super(msg, e);
 		this.errorCode = errorCode;
 		this.msg = msg;
+		errorMsg = e.getMessage();
+		LOG.error(msg, e);
 
 	}
 
@@ -35,7 +41,7 @@ public class AviculturaException extends Exception {
 	}
 
 	public void viewError(Component frame) {
-		JOptionPane.showMessageDialog(frame, msg + " [" + errorCode + "]",
+		JOptionPane.showMessageDialog(frame, msg + " [" + errorMsg + "]",
 				"Fehler im Program", JOptionPane.ERROR_MESSAGE);
 	}
 

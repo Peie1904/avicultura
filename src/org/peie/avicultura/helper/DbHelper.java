@@ -38,6 +38,8 @@ public class DbHelper {
 	public static final String SQL_COMMENT_INDICATOR_2 = "--";
 	public static final String SQL_COMMENT_INDICATOR_3 = "REM ";
 	public static final String TABLE_BIRDPAIR = "BIRDPAIR_WITH_YEAR_TEST";
+	private static final String grandFather = "GRANDFATHERSTRING";
+	private static final String grandMother = "GRANDMOTHERSTRING";
 
 	private static final String importSql = "insert into birddata values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	private PreparedStatement importStmt;
@@ -108,7 +110,7 @@ public class DbHelper {
 	private PreparedStatement selectBirdPairStmt;
 	private static final String insertBirdPairSql = "insert into "
 			+ TABLE_BIRDPAIR
-			+ " (birdPairFATHER,birdPairMOTHER,birdPairYear,GRANDFATHER,GRANDMOTHER) values (?,?,?,?,?)";
+			+ " (birdPairFATHER,birdPairMOTHER,birdPairYear,"+grandFather+","+grandMother+") values (?,?,?,?,?)";
 	private PreparedStatement insertBirdPairStmt;
 
 	private static final String selectModflagForBirdSql = "select modflag from birddata where ringno = ? and COLOR = ?";
@@ -124,7 +126,7 @@ public class DbHelper {
 			+ "DISTINCT papa.RINGNO paparing , "
 			+ "vogelpapa.BIRDSPECIESNAME papavogel , papa.COLOR papafarbe , "
 			+ "mama.RINGNO mamaring , vogelmama.BIRDSPECIESNAME mamavogel , "
-			+ "mama.COLOR mamafarbe , paar.BIRDPAIRID BIRDPAIRID,mama.modflag mamamod,papa.modflag papamod,paar.birdPairYear birdPairYear,paar.GRANDFATHER opa,paar.GRANDMOTHER oma "
+			+ "mama.COLOR mamafarbe , paar.BIRDPAIRID BIRDPAIRID,mama.modflag mamamod,papa.modflag papamod,paar.birdPairYear birdPairYear,paar."+grandFather+" opa,paar."+grandMother+" oma "
 			+ "FROM "
 			+ TABLE_BIRDPAIR
 			+ " paar ,BIRDDATA mama , "
@@ -247,11 +249,13 @@ public class DbHelper {
 
 		return check;
 	}
+	
+	
 
 	private boolean alterBirdPairColumn() throws AviculturaException {
-		String grandFather = "GRANDFATHER";
+		
 		boolean checkGrandFather = existsColumn(TABLE_BIRDPAIR, grandFather);
-		String grandMother = "GRANDMOTHER";
+		
 		boolean checkGrandMother = existsColumn(TABLE_BIRDPAIR, grandMother);
 		
 		boolean check = !checkGrandMother || !checkGrandFather;
@@ -261,9 +265,9 @@ public class DbHelper {
 			log.info("add grandparents");
 
 		String sqlFather = "ALTER TABLE " + TABLE_BIRDPAIR + " ADD "
-				+ grandFather + " bigint";
+				+ grandFather + " varchar(255)";
 		String sqlMother = "ALTER TABLE " + TABLE_BIRDPAIR + " ADD "
-				+ grandMother + " bigint";
+				+ grandMother + " varchar(255)";
 
 		try {
 			Statement stmt = con.createStatement();
@@ -1643,6 +1647,10 @@ public class DbHelper {
 		}
 
 		try {
+			if (opa == null){
+				log.info("Ohne Opa");
+				opa = "";
+			}
 			insertBirdPairStmt.setString(1, vater);
 			insertBirdPairStmt.setString(2, mutter);
 			insertBirdPairStmt.setString(3, YEAR_NOW);

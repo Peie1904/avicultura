@@ -228,6 +228,8 @@ public class NeuesZuchtpaarFrame {
 
 					mutterVogelField.setText("");
 					vaterVogelField.setText("");
+					opaVogelField.setText("");
+					omaVogelField.setText("");
 					break;
 				default:
 					JOptionPane.showMessageDialog(internalFrame, "Code: "
