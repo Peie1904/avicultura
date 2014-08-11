@@ -20,10 +20,11 @@ public class AufzuchtBlattWriterTest {
 		String vater = "vater-0001";
 		String mutter = "mutter-0002";
 		String vogelArt = "Amsel"; 
+		String opma = "blaa";
 		File aufzuchtBlatt = new File("Aufzuchtest.pdf");
 		
 		
-		abw = new AufzuchtBlattWriter(vogelArt,vater, mutter, farbeVater,farbeMutter, zuchtPaarId, aufzuchtBlatt);
+		abw = new AufzuchtBlattWriter(vogelArt,vater, mutter, farbeVater,farbeMutter, zuchtPaarId,opma,opma, aufzuchtBlatt);
 	}
 
 	@Test
