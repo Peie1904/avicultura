@@ -1,0 +1,26 @@
+05-30 22:47:48 jdbc[2]: exception
+org.h2.jdbc.JdbcSQLException: Datenumwandlungsfehler beim Umwandeln von "18489-09-032"
+Data conversion error converting "18489-09-032"; SQL statement:
+select * from birddata, birdpair_with_year_test, birdspecies where ringno = 18489-13-30 and birddata.birdtypeid =birdspecies.birdtypeid and birddata.birdpairid = birdpair_with_year_test.birdpairid [22018-160]
+02-02 12:01:18 jdbc[2]: exception
+org.h2.jdbc.JdbcSQLException: Datenumwandlungsfehler beim Umwandeln von "1-2013"
+Data conversion error converting "1-2013"; SQL statement:
+delete from BIRDPAIR_WITH_YEAR_TEST where birdPairId = ? [22018-160]
+02-17 15:56:56 jdbc[2]: exception
+org.h2.jdbc.JdbcSQLException: Anzahl der Felder stimmt nicht überein
+Column count does not match; SQL statement:
+insert into BIRDPAIR_WITH_YEAR_TEST (birdPairFATHER,birdPairMOTHER,birdPairYear,GRANDFATHER,GRANDMOTHER) values (?,?,?) [21002-160]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:329)
+	at org.h2.message.DbException.get(DbException.java:169)
+	at org.h2.message.DbException.get(DbException.java:146)
+	at org.h2.message.DbException.get(DbException.java:135)
+	at org.h2.command.dml.Insert.prepare(Insert.java:226)
+	at org.h2.command.Parser.prepareCommand(Parser.java:218)
+	at org.h2.engine.Session.prepareLocal(Session.java:415)
+	at org.h2.engine.Session.prepareCommand(Session.java:364)
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1119)
+	at org.h2.jdbc.JdbcPreparedStatement.<init>(JdbcPreparedStatement.java:71)
+	at org.h2.jdbc.JdbcConnection.prepareStatement(JdbcConnection.java:267)
+	at org.peie.avicultura.helper.DbHelper.<init>(DbHelper.java:203)
+	at org.peie.avicultura.main.AviculturaUtility.init(AviculturaUtility.java:29)
+	at org.peie.avicultura.main.Avicultura.main(Avicultura.java:33)

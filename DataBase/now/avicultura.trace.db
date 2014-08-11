@@ -1,0 +1,12 @@
+04-03 15:07:58 jdbc[2]: exception
+org.h2.jdbc.JdbcSQLException: Datenumwandlungsfehler beim Umwandeln von "'' (GRANDFATHER BIGINT)"
+Data conversion error converting "'' (GRANDFATHER BIGINT)"; SQL statement:
+insert into BIRDPAIR_WITH_YEAR_TEST (birdPairFATHER,birdPairMOTHER,birdPairYear,GRANDFATHER,GRANDMOTHER) values (?,?,?,?,?) -- (?1, ?2, ?3, ?4, ?5) [22018-160]
+04-03 15:11:57 jdbc[2]: exception
+org.h2.jdbc.JdbcSQLException: Datenumwandlungsfehler beim Umwandeln von "'' (GRANDFATHER BIGINT)"
+Data conversion error converting "'' (GRANDFATHER BIGINT)"; SQL statement:
+insert into BIRDPAIR_WITH_YEAR_TEST (birdPairFATHER,birdPairMOTHER,birdPairYear,GRANDFATHER,GRANDMOTHER) values (?,?,?,?,?) -- (?1, ?2, ?3, ?4, ?5) [22018-160]
+04-03 15:14:49 jdbc[2]: exception
+org.h2.jdbc.JdbcSQLException: Datenumwandlungsfehler beim Umwandeln von "'' (GRANDFATHER BIGINT)"
+Data conversion error converting "'' (GRANDFATHER BIGINT)"; SQL statement:
+insert into BIRDPAIR_WITH_YEAR_TEST (birdPairFATHER,birdPairMOTHER,birdPairYear,GRANDFATHER,GRANDMOTHER) values (?,?,?,?,?) -- (?1, ?2, ?3, ?4, ?5) [22018-160]
