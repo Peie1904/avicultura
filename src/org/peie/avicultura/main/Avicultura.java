@@ -18,6 +18,7 @@ public class Avicultura extends AviculturaUtility {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		LOG.info("Build: "+Helper.getJarVersion());
 		Properties props = Helper.parseArgs(args);
 
 		APPDATA = props.getProperty(Helper.DBFOLDER);

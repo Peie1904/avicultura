@@ -49,11 +49,11 @@ public class AboutWindow {
 		lblAuthorMichaelPeirick.setBounds(10, 217, 122, 14);
 		frame.getContentPane().add(lblAuthorMichaelPeirick);
 
-		JLabel lblVersionBeta = new JLabel("Version: " + Avicultura.VERSION);
+		JLabel lblVersionBeta = new JLabel("Build: " + Helper.getJarVersion());
 		lblVersionBeta.setFont(new Font(AppNewBirdWindow.LABEL_FONT,
 				AppNewBirdWindow.LABEL_FONT_STYLE,
 				AppNewBirdWindow.LABEL_FONT_SIZE));
-		lblVersionBeta.setBounds(10, 242, 122, 14);
+		lblVersionBeta.setBounds(10, 242, 322, 14);
 		frame.getContentPane().add(lblVersionBeta);
 
 		frame.setVisible(true);

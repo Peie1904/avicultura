@@ -12,6 +12,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.peie.avicultura.main.Avicultura;
 
 
 public class Helper {
@@ -19,6 +20,12 @@ public class Helper {
 	private static final String DB = "db";
 	public static final String DBFOLDER = "DBFOLDER";
 	private static Logger LOG = Logger.getLogger(Helper.class);
+	
+	public static String getJarVersion(){
+		Avicultura avi = new Avicultura();
+		
+		return avi.getClass().getPackage().getImplementationVersion();
+	}
 
 	public static String getPid() {
 		UID uid = new UID();
