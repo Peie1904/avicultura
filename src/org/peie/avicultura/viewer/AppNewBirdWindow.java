@@ -181,15 +181,15 @@ public class AppNewBirdWindow {
 
 			// fillGenderComboBox(birdEditObj.getSpeciesID());
 
-			comboBoxMale.setSelectedItem(birdEditObj.getComboBoxMale());
+			//comboBoxMale.setSelectedItem(birdEditObj.getComboBoxMale());
 
-			comboBoxFemale.setSelectedItem(birdEditObj.getComboBoxFemale());
+			//comboBoxFemale.setSelectedItem(birdEditObj.getComboBoxFemale());
 
-			comboBoxFemale.setEditable(false);
-			comboBoxFemale.setEnabled(false);
+			//comboBoxFemale.setEditable(false);
+			//comboBoxFemale.setEnabled(false);
 
-			comboBoxMale.setEditable(false);
-			comboBoxMale.setEnabled(false);
+			//comboBoxMale.setEditable(false);
+			//comboBoxMale.setEnabled(false);
 
 			breedStart.setText(birdEditObj.getBreedStart());
 			ringAt.setText(birdEditObj.getRingAt());
@@ -202,6 +202,7 @@ public class AppNewBirdWindow {
 			docu.setText(birdEditObj.getDocu());
 			obtman.setText(birdEditObj.getObtman());
 			gov.setText(birdEditObj.getGov());
+			birdPairField.setText(""+birdEditObj.getBirdPairId());
 
 			medicEnd.setText(birdEditObj.getMedicEnd());
 			medicStart.setText(birdEditObj.getMedicStart());
