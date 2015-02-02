@@ -23,6 +23,7 @@ CREATE TABLE `birddata` (
   `birdFATHER` VARCHAR(35) DEFAULT NULL,
   `birdMOTHER` VARCHAR(35) DEFAULT NULL,
   `MODFLAG` NUMBER(15) DEFAULT 0,
+  `birdPairId` bigint,
   PRIMARY KEY (`birdDataId`)
 );
 
@@ -31,3 +32,12 @@ create table `birdspecies` (
 	`birdspeciesname` VARCHAR(50) NOT NULL,
 	PRIMARY KEY (`birdTypeId`)
 	);
+	
+	create table 
+BIRDPAIR_WITH_YEAR_TEST (
+`birdPairId` bigint auto_increment,
+`birdPairFATHER` VARCHAR(35) DEFAULT NULL,
+`birdPairMOTHER` VARCHAR(35) DEFAULT NULL,
+birdPairYear bigint DEFAULT 0,
+PRIMARY KEY (`birdPairId`));
+	
