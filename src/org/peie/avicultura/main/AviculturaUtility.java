@@ -8,6 +8,7 @@ import org.peie.avicultura.helper.AviProperties;
 import org.peie.avicultura.helper.AviculturaException;
 import org.peie.avicultura.helper.BackUp;
 import org.peie.avicultura.helper.DbHelper;
+import org.peie.avicultura.helper.Helper;
 import org.peie.avicultura.viewer.Application;
 
 public abstract class AviculturaUtility {
@@ -48,8 +49,14 @@ public abstract class AviculturaUtility {
 		}
 
 		properties = new AviProperties();
+		
+		String ringNo = Helper.getRingNumber();
 
-		properties.put(AviProperties.KEY_RING_NO, "18489");
+		if (ringNo != null){
+		properties.put(AviProperties.KEY_RING_NO, ringNo);
+		}else{
+			properties.put(AviProperties.KEY_RING_NO, "0");
+		}
 
 	}
 

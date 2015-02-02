@@ -26,6 +26,12 @@ public class Helper {
 		
 		return avi.getClass().getPackage().getImplementationVersion();
 	}
+	
+	public static String getRingNumber(){
+		Avicultura avi = new Avicultura();
+		
+		return avi.getClass().getPackage().getImplementationTitle();
+	}
 
 	public static String getPid() {
 		UID uid = new UID();
