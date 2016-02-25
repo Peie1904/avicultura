@@ -2,7 +2,6 @@ package org.peie.avicultura.helper;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -23,7 +22,6 @@ import javax.swing.event.InternalFrameEvent;
 
 import org.apache.log4j.Logger;
 import org.peie.avicultura.viewer.Application;
-import org.peie.avicultura.viewer.ZuchtPaareFrame;
 
 public class AviInternalFrame extends JInternalFrame {
 
